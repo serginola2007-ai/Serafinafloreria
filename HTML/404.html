@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Página no encontrada | Serafina Florería</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" type="image/x-icon" href="../IMAGENES/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:ital,wght@0,200;0,300;0,400;0,500;1,200;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../CSS/404.css">
+<style>
+.notfound-page {
+  min-height:100svh;
+  background:#0e0806;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:40px 24px;
+  position:relative; overflow:hidden;
+}
+.notfound-page::before {
+  content:'404';
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  font-family:var(--serif); font-size:clamp(160px,25vw,320px);
+  color:rgba(154,74,90,.055); font-weight:300; line-height:1;
+  pointer-events:none; user-select:none; letter-spacing:-4px;
+}
+.nf-bg {
+  position:absolute; inset:0;
+  background-image:url('../IMAGENES/dia-de-la-madre-9.jpg');
+  background-size:cover; background-position:center;
+  opacity:.04; pointer-events:none;
+}
+.nf-inner { position:relative; z-index:2; max-width:560px; }
+.nf-eyebrow { font-size:9px; letter-spacing:5px; text-transform:uppercase; color:var(--rosa-lt); margin-bottom:28px; }
+.nf-title {
+  font-family:var(--serif); font-size:clamp(38px,6vw,72px);
+  font-weight:300; color:#fff; line-height:1; margin-bottom:20px;
+}
+.nf-title em { color:var(--rosa-lt); font-style:italic; display:block; margin-top:6px; }
+.nf-desc { font-size:14px; color:rgba(255,255,255,.45); line-height:1.9; font-weight:300; margin-bottom:44px; }
+.nf-actions { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+.nf-btn {
+  padding:14px 38px; font-size:10px; letter-spacing:2.5px; text-transform:uppercase;
+  font-family:var(--sans); font-weight:400; text-decoration:none; transition:.3s; cursor:pointer;
+  display:inline-flex; align-items:center; gap:10px;
+}
+.nf-btn-solid   { background:var(--rosa); color:#fff; border:1px solid var(--rosa); }
+.nf-btn-solid:hover { background:var(--rosa-dk); }
+.nf-btn-outline { border:1px solid rgba(255,255,255,.25); color:rgba(255,255,255,.75); background:transparent; }
+.nf-btn-outline:hover { background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.5); }
+.nf-divider { width:1px; height:48px; background:linear-gradient(to bottom, var(--rosa), transparent); margin:48px auto 40px; }
+.nf-links { display:flex; gap:28px; flex-wrap:wrap; justify-content:center; }
+.nf-links a { font-size:10px; letter-spacing:2.5px; text-transform:uppercase; color:rgba(255,255,255,.3); text-decoration:none; transition:.2s; }
+.nf-links a:hover { color:var(--rosa-lt); }
+@media (max-width:600px) {
+  .nf-actions { flex-direction:column; align-items:center; }
+  .nf-btn { width:100%; justify-content:center; }
+}
+</style>
+</head>
+<body>
+<div id="cur"></div><div id="cur-r"></div>
+<button class="theme-btn" id="themeBtn" aria-label="Cambiar modo" style="position:fixed;top:24px;right:24px;z-index:999;">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+
+<div class="notfound-page">
+  <div class="nf-bg"></div>
+  <div class="nf-inner">
+    <p class="nf-eyebrow">Serafina Florería · Error 404</p>
+    <h1 class="nf-title">Página no<em>encontrada.</em></h1>
+    <p class="nf-desc">La página que buscás no existe o fue movida.<br>Pero nuestras flores siguen acá, esperándote.</p>
+    <div class="nf-actions">
+      <a href="index.html" class="nf-btn nf-btn-solid">Volver al inicio</a>
+      <a href="catalogo.html" class="nf-btn nf-btn-outline">Ver Catálogo</a>
+    </div>
+    <div class="nf-divider"></div>
+    <div class="nf-links">
+      <a href="Nuestra_historia.html">Nuestra Historia</a>
+      <a href="pedido.html">Pedido Especial</a>
+      <a href="https://wa.me/595985654607" target="_blank">WhatsApp</a>
+    </div>
+  </div>
+</div>
+
+<script src="../JAVA/404.js"></script>
+</body>
+</html>

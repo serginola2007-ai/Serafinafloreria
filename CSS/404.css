@@ -1,0 +1,151 @@
+/* ════════════════════════════════════════════
+   SERAFINA FLORERÍA — 404.css
+   CSS específico para 404.html
+   ════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════════════
+   SERAFINA FLORERÍA — STYLESHEET GLOBAL
+   serafina.css · v2.0 · 2026
+   Usado por: index.html, catalogo.html, Nuestra_historia.html,
+              pedido.html, aviso-legal.html, politica-de-privacidad.html,
+              configuracion-de-cookies.html
+   ════════════════════════════════════════════════════════════ */
+
+/* ─── 1. TOKENS ─────────────────────────────────────────── */
+:root,
+[data-theme="dark"] {
+  --crema:   #faf6f0; --beige:  #f0e6d6; --beige2: #e8d8c4;
+  --rosa:    #9a4a5a; --rosa-lt:#d4a0a8; --rosa-dk:#6d2f3d; --rosa-pale:#f5eaec;
+  --cafe:    #4a3020; --negro:  #0e0806; --gris:   #7a6860; --gris-lt: #b0a49c;
+  --gold:    #c9a96e; --gold-lt:#e8d4a8;
+  --serif:   'Cormorant Garamond', Georgia, serif;
+  --sans:    'DM Sans', system-ui, sans-serif;
+
+  /* semánticos */
+  --nav-bg:        rgba(14,8,6,.97);
+  --nav-logo:      var(--crema);
+  --nav-link-sc:   var(--crema);
+  --body-bg:       #0e0806;
+  --body-txt:      var(--crema);
+  --about-bg:      #0e0806;
+  --about-txt:     rgba(255,255,255,.55);
+  --badge-border:  rgba(255,255,255,.12);
+  --badge-txt:     var(--crema);
+  --promesa-bg:    #140c08;
+  --promesa-item:  #1c1008;
+  --promesa-h:     var(--crema);
+  --promesa-p:     rgba(255,255,255,.45);
+  --test-bg:       #0e0806;
+  --test-card:     #1a100c;
+  --test-txt:      var(--crema);
+  --test-auth:     rgba(255,255,255,.4);
+  --footer-bg:     #060402;
+  --footer-txt:    rgba(255,255,255,.25);
+  --footer-copy:   rgba(255,255,255,.18);
+  --contact-bg:    #0e0806;
+  --sec-sub-c:     rgba(255,255,255,.35);
+  --hamburger-c:   var(--crema);
+  --mob-menu-bg:   #0e0806;
+  --mob-link:      var(--crema);
+  /* historia */
+  --intro-txt:     rgba(255,255,255,.6);
+  --local-bg:      #0e0806;
+  --local-txt:     rgba(255,255,255,.5);
+  --local-grad:    linear-gradient(to right,transparent 60%,#0e0806);
+  --ld-val:        var(--crema);
+  --ld-border:     rgba(255,255,255,.08);
+  /* pedido */
+  --config-bg:     #1a100c;
+  --step-title:    var(--crema);
+  --step-desc:     rgba(255,255,255,.45);
+  --chip-border:   rgba(255,255,255,.12);
+  --chip-txt:      rgba(255,255,255,.7);
+  --chip-sel-bg:   var(--crema);
+  --chip-sel-txt:  #1a0e0a;
+  --field-border:  rgba(255,255,255,.12);
+  --field-txt:     var(--crema);
+  --field-ph:      rgba(255,255,255,.3);
+  --gar-bg:        #1a100c;
+  --gar-txt:       var(--crema);
+  --gar-desc:      rgba(255,255,255,.45);
+}
+
+[data-theme="light"] {
+  --nav-bg:        rgba(250,246,240,.97);
+  --nav-logo:      #1a0e0a;
+  --nav-link-sc:   #1a0e0a;
+  --body-bg:       var(--crema);
+  --body-txt:      #1a0e0a;
+  --about-bg:      var(--crema);
+  --about-txt:     #5a4a40;
+  --badge-border:  rgba(74,48,32,.18);
+  --badge-txt:     var(--cafe);
+  --promesa-bg:    var(--beige);
+  --promesa-item:  var(--crema);
+  --promesa-h:     var(--cafe);
+  --promesa-p:     #5a4a40;
+  --test-bg:       var(--crema);
+  --test-card:     var(--beige);
+  --test-txt:      var(--cafe);
+  --test-auth:     #7a6860;
+  --footer-bg:     #060402;
+  --footer-txt:    rgba(255,255,255,.3);
+  --footer-copy:   rgba(255,255,255,.2);
+  --contact-bg:    #1a0e0a;
+  --sec-sub-c:     #7a6860;
+  --hamburger-c:   #1a0e0a;
+  --mob-menu-bg:   #1a0e0a;
+  --mob-link:      var(--crema);
+  /* historia */
+  --intro-txt:     var(--cafe);
+  --local-bg:      var(--crema);
+  --local-txt:     #5a4a40;
+  --local-grad:    linear-gradient(to right,transparent 60%,var(--crema));
+  --ld-val:        #1a0e0a;
+  --ld-border:     rgba(74,48,32,.1);
+  /* pedido */
+  --config-bg:     var(--crema);
+  --step-title:    var(--cafe);
+  --step-desc:     #7a6860;
+  --chip-border:   rgba(74,48,32,.2);
+  --chip-txt:      var(--cafe);
+  --chip-sel-bg:   #1a0e0a;
+  --chip-sel-txt:  #fff;
+  --field-border:  rgba(74,48,32,.2);
+  --field-txt:     #1a0e0a;
+  --field-ph:      #7a6860;
+  --gar-bg:        var(--beige);
+  --gar-txt:       var(--cafe);
+  --gar-desc:      #7a6860;
+}
+
+/* ─── 2. RESET & BASE ───────────────────────────────────── */
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; -webkit-font-smoothing:antialiased; }
+body {
+  font-family: var(--sans);
+  background: var(--body-bg);
+  color: var(--body-txt);
+  overflow-x: hidden;
+  transition: background .35s, color .35s;
+}
+img { display:block; max-width:100%; }
+a   { text-decoration:none; color:inherit; }
+
+/* ─── 22. WA FLOAT ──────────────────────────────────────── */
+.wa-float { position:fixed; bottom:28px; right:28px; z-index:900; background:#25d366; color:#fff; width:54px; height:54px; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(37,211,102,.4); text-decoration:none; transition:transform .3s, box-shadow .3s; }
+.wa-float:hover { transform:scale(1.1); box-shadow:0 6px 28px rgba(37,211,102,.55); }
+.wa-float svg { width:26px; height:26px; fill:#fff; }
+
+/* ════════════════════════════════════════════
+   REGLAS RECUPERADAS — se perdieron al separar 404.css
+   (reinyectadas desde la base compartida del proyecto)
+   ════════════════════════════════════════════ */
+.theme-btn { width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,.25); background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.3s; color:rgba(255,255,255,.7); flex-shrink:0; }
+nav.scrolled .theme-btn, nav.solid .theme-btn { border-color:rgba(74,48,32,.3); color:var(--nav-logo); }
+.theme-btn:hover { border-color:var(--rosa); color:var(--rosa); }
+.theme-btn svg { width:16px; height:16px; }
+.icon-moon { display:block; }
+.icon-sun { display:none; }
+[data-theme="light"] .icon-moon { display:none; }
+[data-theme="light"] .icon-sun { display:block; }
