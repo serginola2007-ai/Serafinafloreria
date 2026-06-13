@@ -1,12 +1,11 @@
 /* ═══════════════════════════════════════════════════════════════
    SERAFINA FLORERÍA — catalogo-datos.js
    Ubicación: JAVA/catalogo-datos.js
-
    ┌─────────────────────────────────────────────────────────┐
    │  CÓMO AGREGAR UN PRODUCTO                               │
    │                                                         │
    │  1. Buscá la sección donde querés agregar               │
-   │     (ej: /* ── ROMÁNTICOS */)                           │
+   │     (ej: ROMÁNTICOS)                                   │
    │  2. Copiá un bloque { ... } existente                   │
    │  3. Pegalo al final de la lista de esa sección          │
    │  4. Cambiá: id, nombre, precio, descripcion, fotos      │
@@ -16,7 +15,7 @@
    │  Las fotos van relativas desde la carpeta HTML/         │
    │  Ej: "../IMAGENES/Romanticos/nombre-foto.jpg"           │
    └─────────────────────────────────────────────────────────┘
-═══════════════════════════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════════ */
 
 window.SERAFINA_CATALOGO = {
 
@@ -86,122 +85,122 @@ window.SERAFINA_CATALOGO = {
     {
       id:          'rom-02',
       seccion:     'romanticos',
-      nombre:      'Arreglo Romántico 2',
+      nombre:      'Ramo Amor',
       precio:      '',
       descripcion: '',
-      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_2.jpg']
+      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_2_ramo_amor.jpg']
     },
     {
       id:          'rom-03',
       seccion:     'romanticos',
-      nombre:      'Arreglo Romántico 3',
+      nombre:      'Ramo Fuscia',
       precio:      '',
       descripcion: '',
-      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_3.jpg']
+      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_3_ramo_fuscia.jpg']
     },
     {
       id:          'rom-04',
       seccion:     'romanticos',
-      nombre:      'Arreglo Romántico 4',
+      nombre:      'Ramo de Lirios',
       precio:      '',
       descripcion: '',
-      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_4.jpg']
+      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_4_ramo_de_lirios.jpg']
     },
     {
       id:          'rom-05',
       seccion:     'romanticos',
-      nombre:      'Arreglo Romántico 5',
+      nombre:      'Ramo Pink',
       precio:      '',
       descripcion: '',
-      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_5.jpg']
+      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_5_ramo_pink.jpg']
     },
     {
       id:          'rom-06',
       seccion:     'romanticos',
-      nombre:      'Arreglo Romántico 6',
+      nombre:      'Ramo Sweet',
       precio:      '',
       descripcion: '',
-      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_6.jpg']
+      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_6_ramo_sweet.jpg']
     },
     {
       id:          'rom-07',
       seccion:     'romanticos',
-      nombre:      'Arreglo Romántico 7',
+      nombre:      'Ramo Luz de Amor',
       precio:      '',
       descripcion: '',
-      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_7.jpg']
+      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_7_ramo_luz_de_amor.jpg']
     },
     {
       id:          'rom-08',
       seccion:     'romanticos',
-      nombre:      'Arreglo Romántico 8',
+      nombre:      'Ramo Pasión',
       precio:      '',
       descripcion: '',
-      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_8.jpg']
+      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_8_ramo_pasion.jpg']
     },
     {
       id:          'rom-09',
       seccion:     'romanticos',
-      nombre:      'Arreglo Romántico 9',
+      nombre:      'Ramo Pink G',
       precio:      '',
       descripcion: '',
-      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_9.jpg']
+      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_9_ramo_pink_g.jpg']
     },
     {
       id:          'rom-10',
       seccion:     'romanticos',
-      nombre:      'Arreglo Romántico 10',
+      nombre:      'Ramo Violeta',
       precio:      '',
       descripcion: '',
-      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_10.jpg']
+      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_10_ramo_violeta.jpg']
     },
     {
       id:          'rom-11',
       seccion:     'romanticos',
-      nombre:      'Arreglo Romántico 11',
+      nombre:      'Ramo Bloom',
       precio:      '',
       descripcion: '',
-      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_11.jpg']
+      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_11_ramo_bloom.jpg']
     },
     {
       id:          'rom-12',
       seccion:     'romanticos',
-      nombre:      'Arreglo Romántico 12',
+      nombre:      'Ramo Love',
       precio:      '',
       descripcion: '',
-      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_12.jpg']
+      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_12_ramo_love.jpg']
     },
     {
       id:          'rom-13',
       seccion:     'romanticos',
-      nombre:      'Arreglo Romántico 13',
+      nombre:      'Jarron Pink',
       precio:      '',
       descripcion: '',
-      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_13.jpg']
+      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_17_jarron_pink.jpg']
     },
     {
       id:          'rom-14',
       seccion:     'romanticos',
-      nombre:      'Arreglo Romántico 14',
+      nombre:      'Box Sweet',
       precio:      '',
       descripcion: '',
-      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_14.jpg']
+      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_18_box_sweet.jpg']
     },
     {
       id:          'rom-15',
       seccion:     'romanticos',
-      nombre:      'Arreglo Romántico 15',
+      nombre:      'Box Bloom',
       precio:      '',
       descripcion: '',
-      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_15.jpg']
+      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_19_box_bloom.jpg']
     },
     {
       id:          'rom-16',
       seccion:     'romanticos',
-      nombre:      'Arreglo Romántico 16',
+      nombre:      'Box Valentin',
       precio:      '',
       descripcion: '',
-      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_16.jpg']
+      fotos:       ['../IMAGENES/Romanticos/arreglo_romanticos_20_box_valentin.jpg']
     },
 
     /* ─────────────────────────────

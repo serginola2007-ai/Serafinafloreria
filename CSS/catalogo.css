@@ -178,12 +178,12 @@ footer { background:var(--footer-bg); padding:48px 72px; display:flex; justify-c
 .cat-hero-scroll-line { width:40px; height:1px; background:rgba(255,255,255,.15); }
 
 /* ─── 24. CATÁLOGO — FILTROS ────────────────────────────── */
-.filter-wrap { display:flex; justify-content:center; gap:8px; padding:36px 40px; flex-wrap:wrap; border-bottom:1px solid var(--beige); background:var(--crema); position:sticky; top:68px; z-index:100; }
+.filter-wrap { display:flex; justify-content:center; gap:8px; padding:18px 20px; flex-wrap:wrap; border-bottom:1px solid var(--beige); background:var(--crema); position:sticky; top:68px; z-index:100; }
 .filter-btn { padding:9px 22px; border:1px solid rgba(74,48,32,.18); background:transparent; color:var(--cafe); font-family:var(--sans); font-size:9px; letter-spacing:2.5px; text-transform:uppercase; cursor:pointer; transition:.25s; font-weight:400; }
 .filter-btn:hover, .filter-btn.active { background:var(--negro); color:#fff; border-color:var(--negro); }
 
 /* ─── 25. CATÁLOGO — HEADERS DE SECCIÓN ─────────────────── */
-.cat-section-header { padding:70px 72px 40px; background:var(--crema); }
+.cat-section-header { padding:35px 72px 40px; background:var(--crema); }
 .cat-section-header-inner { display:flex; align-items:flex-end; justify-content:space-between; gap:40px; flex-wrap:wrap; }
 .cat-sec-tag  { font-size:8.5px; letter-spacing:4.5px; text-transform:uppercase; color:var(--rosa); margin-bottom:12px; }
 .cat-sec-h2   { font-family:var(--serif); font-size:clamp(38px,5vw,68px); font-weight:300; line-height:.95; color:var(--negro); }
