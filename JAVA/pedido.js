@@ -6,22 +6,22 @@
 'use strict';
 
 /* ══════════════════════════════════════════════════════════════════════════
-   SERAFINA FLORERÍA — serafina.js
-   Script global · v2.0 · 2026
+   SERAFINA FLORERÍA — pedido.js
+   Script específico · v2.1 · 2026
 
    Módulos:
      1. Tema claro/oscuro   — todas las páginas
      2. Cursor personalizado — desktop, todas las páginas
-     3. Loader              — index.html
      4. Nav scroll          — todas las páginas
      5. Hamburger / menú    — todas las páginas
      6. Reveal on scroll    — todas las páginas
-     7. Filtro catálogo     — catalogo.html
      8. Pedido especial     — pedido.html (chips, colores, resumen, WhatsApp)
      9. Cookies             — configuracion-de-cookies.html
+    11. Cookie consent banner
+    12. Scroll progress bar
+    13. Anchor scroll con offset de nav
+    21. Validación de fecha
    ══════════════════════════════════════════════════════════════════════════ */
-
-'use strict';
 
 /* ─────────────────────────────────────────────────────────────────────────
    UTILIDADES
@@ -204,7 +204,7 @@ const Reveal = (() => {
    ───────────────────────────────────────────────────────────────────────── */
 
 const PedidoForm = (() => {
-  const state = { cat: '', color: '', size: '', entrega: '' };
+  const state = { cat: '', color: '', size: '', entrega: '', nombre: '' };
   const PH = '<span class="sb-placeholder">Sin elegir</span>';
 
   // Campos obligatorios: [key de state, id del sb-item, label legible]
@@ -212,6 +212,7 @@ const PedidoForm = (() => {
     { key: 'cat',     sumId: 'sum-cat',     label: 'la ocasión'  },
     { key: 'size',    sumId: 'sum-size',    label: 'el tamaño'   },
     { key: 'entrega', sumId: 'sum-entrega', label: 'la entrega'  },
+    { key: 'nombre',  sumId: 'sum-nombre',  label: 'tu nombre'   },
   ];
 
   function _setSum(id, val) {
@@ -242,7 +243,7 @@ const PedidoForm = (() => {
   /* Limpia todos los errores de validación */
   function _clearErrors() {
     REQUIRED.forEach(({ sumId }) => _setRowError(sumId, false));
-    const btn = $('#.sb-send-btn') || document.querySelector('.sb-send-btn');
+    const btn = document.querySelector('.sb-send-btn');
     btn?.classList.remove('sb-shake');
   }
 
@@ -256,6 +257,7 @@ const PedidoForm = (() => {
     _setSum('sum-color',   state.color);
     _setSum('sum-size',    state.size);
     _setSum('sum-entrega', state.entrega);
+    _setSum('sum-nombre',  state.nombre);
 
     const fechaEl = document.getElementById('fecha');
     if (fechaEl) {
@@ -360,7 +362,13 @@ const PedidoForm = (() => {
 
     // Campos de texto
     fechaEl.addEventListener('change', updateSummary);
-    document.getElementById('nombre')?.addEventListener('input', updateSummary);
+    const nombreEl = document.getElementById('nombre');
+    if (nombreEl) {
+      nombreEl.addEventListener('input', () => {
+        state.nombre = nombreEl.value.trim();
+        updateSummary();
+      });
+    }
   }
 
   return { init, sendToWhatsApp };
