@@ -131,6 +131,7 @@ nav.scrolled .hamburger span, nav.solid .hamburger span { background:var(--hambu
 /* ─── 6. ANIMACIONES ────────────────────────────────────── */
 @keyframes fu  { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
 @keyframes fadeUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeInSlideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
 .reveal { opacity:0; transform:translateY(28px); transition:opacity .75s ease, transform .75s ease; }
 .reveal.visible { opacity:1; transform:translateY(0); }
 
@@ -241,6 +242,8 @@ footer { background:var(--footer-bg); padding:48px 72px; display:flex; justify-c
   line-height:.9; 
   color:#fff;
   transition: color .35s;
+  animation: fadeInSlideUp .9s .3s ease forwards;
+  opacity: 0;
 }
 
 .cat-hero-h1 em { 
@@ -257,6 +260,8 @@ footer { background:var(--footer-bg); padding:48px 72px; display:flex; justify-c
   font-weight:200; 
   line-height:1.7;
   transition: color .35s;
+  animation: fadeInSlideUp .9s .5s ease forwards;
+  opacity: 0;
 }
 [data-theme="light"] .cat-hero-sub { 
   color:var(--gris);
