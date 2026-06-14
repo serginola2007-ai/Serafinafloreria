@@ -10,7 +10,7 @@ const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
 
 /* ─── TEMA CLARO / OSCURO ───────────────────── */
 const Tema = (() => {
-  const CLAVE = 'serafina-tema';
+  const CLAVE = 'serafina-theme';
   const html  = document.documentElement;
 
   function obtener()    { return html.getAttribute('data-theme'); }
