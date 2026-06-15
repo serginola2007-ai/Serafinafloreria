@@ -223,7 +223,7 @@ window.SERAFINA_CATALOGO = {
       nombre:      'Ramo de 3 Gerberas',
       precio:      '75.000 Gs.',
       descripcion: 'Ramo pequeño con 3 gerberas, diseño alegre y colorido, ideal para expresar cariño y alegría de una manera sencilla y encantadora en cualquier ocasión especial.',
-      fotos:       ['../IMAGENES/Pequeños Detalles/Arr1_Ramo_de_3_Gerberas.png']
+      fotos:       ['../IMAGENES/Pequenos_detalles/Arr1_Ramo_de_3_Gerberas.png']
     },
     {
       id:          'det-02',
@@ -231,7 +231,7 @@ window.SERAFINA_CATALOGO = {
       nombre:      'Ramo de 3 Rosas',
       precio:      '90.000 Gs.',
       descripcion: 'Ramo pequeño con 3 rosas, diseño clásico y romántico, ideal para expresar amor y cariño de una manera sencilla y encantadora en cualquier ocasión especial.',
-      fotos:       ['../IMAGENES/Pequeños Detalles/Arr2_Ramo_de_3_Rosas.png']
+      fotos:       ['../IMAGENES/Pequenos_detalles/Arr2_Ramo_de_3_Rosas.png']
     },
     {
       id:          'det-03',
@@ -239,7 +239,7 @@ window.SERAFINA_CATALOGO = {
       nombre:      'Ramo de 3 Rosas Coreano',
       precio:      '95.000 Gs.',
       descripcion: 'Ramo pequeño con 3 rosas con estilo coreano, diseño elegante y sofisticado, ideal para expresar amor y cariño de una manera sencilla y encantadora en cualquier ocasión especial.',
-      fotos:       ['../IMAGENES/Pequeños Detalles/Arr3_Ramo_de_3_Rosas_Coreano.png']
+      fotos:       ['../IMAGENES/Pequenos_detalles/Arr3_Ramo_de_3_Rosas_Coreano.png']
     },
     {
       id:          'det-04',
@@ -247,7 +247,7 @@ window.SERAFINA_CATALOGO = {
       nombre:      'Ramo de Claveles',
       precio:      '75.000 Gs.',
       descripcion: 'Ramo pequeño con claveles, diseño delicado y encantador, ideal para expresar cariño y alegría de una manera sencilla y hermosa en cualquier ocasión especial.',
-      fotos:       ['../IMAGENES/Pequeños Detalles/Arr4_Ramo_de_Claveles.png']
+      fotos:       ['../IMAGENES/Pequenos_detalles/Arr4_Ramo_de_Claveles.png']
     },
     {
       id:          'det-05',
@@ -255,7 +255,7 @@ window.SERAFINA_CATALOGO = {
       nombre:      'Ramo Love',
       precio:      '95.000 Gs.',
       descripcion: 'Ramo pequeño con flores en tonos rojos y rosas, diseño clásico y romántico, ideal para expresar amor y pasión de una manera sencilla y encantadora en cualquier ocasión especial.',
-      fotos:       ['../IMAGENES/Pequeños Detalles/Arr5_Ramo_Love.png']
+      fotos:       ['../IMAGENES/Pequenos_detalles/Arr5_Ramo_Love.png']
     },
     {
       id:          'det-06',
@@ -263,7 +263,7 @@ window.SERAFINA_CATALOGO = {
       nombre:      'Ramo de Lirio Petit',
       precio:      '80.000 Gs.',
       descripcion: 'Ramo pequeño con lirios petit, diseño elegante y sofisticado, ideal para expresar admiración y respeto de una manera sencilla y hermosa en cualquier ocasión especial.',
-      fotos:       ['../IMAGENES/Pequeños Detalles/Arr6_Ramo_de_Lirio_Petit.png']
+      fotos:       ['../IMAGENES/Pequenos_detalles/Arr6_Ramo_de_Lirio_Petit.png']
     },
     {
       id:          'det-07',
@@ -271,7 +271,7 @@ window.SERAFINA_CATALOGO = {
       nombre:      'Ramo de Girasol y Margaritas',
       precio:      '80.000 Gs.',
       descripcion: 'Ramo pequeño con un girasol y margaritas, diseño fresco y alegre, ideal para expresar alegría y buena voluntad de una manera sencilla y hermosa en cualquier ocasión especial.',
-      fotos:       ['../IMAGENES/Pequeños Detalles/Arr7_Ramo_de_Girasol_y_Margaritas.png']
+      fotos:       ['../IMAGENES/Pequenos_detalles/Arr7_Ramo_de_Girasol_y_Margaritas.png']
     },
     {
       id:          'det-08',
@@ -279,7 +279,7 @@ window.SERAFINA_CATALOGO = {
       nombre:      'Ramo de Rosa y Girasol',
       precio:      '70.000 Gs.',
       descripcion: 'Ramo pequeño con una rosa y un girasol, diseño romántico y encantador, ideal para expresar amor y admiración de una manera sencilla y hermosa en cualquier ocasión especial.',
-      fotos:       ['../IMAGENES/Pequeños Detalles/Arr8_Ramo_de_Rosa_y_Girasol.png']
+      fotos:       ['../IMAGENES/Pequenos_detalles/Arr8_Ramo_de_Rosa_y_Girasol.png']
     },
     {
       id:          'det-09',
@@ -287,7 +287,7 @@ window.SERAFINA_CATALOGO = {
       nombre:      'Ramo Alegre',
       precio:      '120.000 Gs.',
       descripcion: 'Ramo pequeño con flores alegres y vibrantes, diseño fresco y animado, ideal para expresar alegría y buen humor de una manera sencilla y hermosa en cualquier ocasión especial.',
-      fotos:       ['../IMAGENES/Pequeños Detalles/Arr9_Ramo_Alegre.png']
+      fotos:       ['../IMAGENES/Pequenos_detalles/Arr9_Ramo_Alegre.png']
     },
     {
       id:          'det-10',
@@ -295,7 +295,7 @@ window.SERAFINA_CATALOGO = {
       nombre:      'Ramo de mini Margaritas',
       precio:      '75.000 Gs.',
       descripcion: 'Ramo pequeño con mini margaritas, diseño adorable y encantador, ideal para expresar cariño y afecto de una manera sencilla y hermosa en cualquier ocasión especial.',
-      fotos:       ['../IMAGENES/Pequeños Detalles/Arr10_Ramo_de_mini_Margaritas.png']
+      fotos:       ['../IMAGENES/Pequenos_detalles/Arr10_Ramo_de_mini_Margaritas.png']
     },
     {
       id:          'det-11',
@@ -303,7 +303,7 @@ window.SERAFINA_CATALOGO = {
       nombre:      'Ramo de Girasoles',
       precio:      '100.000 Gs.',
       descripcion: 'Ramo pequeño con girasoles, diseño soleado y alegre, ideal para expresar alegría y buena voluntad de una manera sencilla y hermosa en cualquier ocasión especial.',
-      fotos:       ['../IMAGENES/Pequeños Detalles/Arr11_Ramo_de_Girasoles.png']
+      fotos:       ['../IMAGENES/Pequenos_detalles/Arr11_Ramo_de_Girasoles.png']
     },
     {
       id:          'det-12',
@@ -311,7 +311,7 @@ window.SERAFINA_CATALOGO = {
       nombre:      'Ramo Love Lila',
       precio:      '95.000 Gs.',
       descripcion: 'Ramo pequeño con flores en tonos de lila, diseño elegante y sofisticado, ideal para expresar amor y admiración de una manera sencilla y hermosa en cualquier ocasión especial.',
-      fotos:       ['../IMAGENES/Pequeños Detalles/Arr12_Ramo_Love_Lila.png']
+      fotos:       ['../IMAGENES/Pequenos_detalles/Arr12_Ramo_Love_Lila.png']
     },
     /* ─────────────────────────────
        GRADUADOS
