@@ -23,7 +23,7 @@ export function createRouter({ view, onNavigate }) {
     if (typeof cleanup === 'function') { try { cleanup(); } catch { /* noop */ } }
     cleanup = null;
     const { path, query } = parse();
-    const route = findRoute(path);
+    const found = findRoute(path); const route = found?.route; const params = found?.params || {};
     clear(view);
     if (!route) { onNavigate?.(null); view.append(notFound()); document.title = 'No encontrado · Serafina'; return; }
     onNavigate?.(route);
@@ -34,7 +34,7 @@ export function createRouter({ view, onNavigate }) {
       const mod = await route.load();
       if (my !== token) return;
       clear(holder);
-      const result = await mod.default({ view: holder, query, navigate, route, session });
+      const result = await mod.default({ view: holder, query, params, navigate, route, session });
       if (my === token) cleanup = result; else if (typeof result === 'function') result();
       view.focus({ preventScroll: true });
     } catch (e) {

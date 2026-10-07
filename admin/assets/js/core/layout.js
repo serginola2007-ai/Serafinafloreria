@@ -17,7 +17,7 @@ export function buildShell({ session, navigate }) {
     for (const r of visibleRoutes(session)) (groups.get(r.group) || groups.set(r.group, []).get(r.group)).push(r);
     for (const [g, routes] of groups) {
       nav.append(h('div', { class: 'nav-group' }, g !== 'General' && h('div', { class: 'nav-group-title' }, g),
-        routes.map((r) => h('a', { class: 'nav-link', href: `#${r.path}`, 'aria-current': current?.id === r.id ? 'page' : null, onclick: () => app.classList.remove('nav-open') }, icon(r.icon), r.label))));
+        routes.map((r) => h('a', { class: 'nav-link', href: `#${r.path}`, 'aria-current': (current?.navId || current?.id) === r.id ? 'page' : null, onclick: () => app.classList.remove('nav-open') }, icon(r.icon), r.label))));
     }
   }
 

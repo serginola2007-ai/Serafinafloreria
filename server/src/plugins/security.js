@@ -7,7 +7,7 @@ const rateLimit = require('@fastify/rate-limit');
 async function register(app, config) {
   await app.register(helmet, {
     hsts: config.isProd ? { maxAge: 31536000, includeSubDomains: true } : false,
-    contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], imgSrc: ["'self'", 'data:', 'https:'], objectSrc: ["'none'"], frameAncestors: ["'none'"], baseUri: ["'self'"], formAction: ["'self'"] } },
+    contentSecurityPolicy: { directives: { defaultSrc: ["'self'"], imgSrc: ["'self'", 'data:', 'https:', new URL(config.publicUrl).origin], objectSrc: ["'none'"], frameAncestors: ["'none'"], baseUri: ["'self'"], formAction: ["'self'"] } },
     crossOriginResourcePolicy: { policy: 'cross-origin' }, // la API pública sirve datos a Netlify
   });
   const allowed = new Set(config.allowedOrigins);

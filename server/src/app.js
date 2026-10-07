@@ -7,6 +7,19 @@ const { makeHasher } = require('./lib/passwords');
 const security = require('./plugins/security');
 const errors = require('./plugins/errors');
 const auth = require('./plugins/auth');
+const Ajv = require('ajv');
+const addFormats = require('ajv-formats');
+
+// Validación estricta del cuerpo JSON (sin coerción: null/true/"123" NO se convierten en números).
+// Solo query string y params se coercionan, porque llegan siempre como texto.
+function makeValidatorCompiler() {
+  const make = (coerceTypes) => addFormats(new Ajv({ removeAdditional: false, coerceTypes, useDefaults: true, allErrors: false, strict: false }));
+  const strict = make(false); const loose = make(true);
+  return ({ schema, httpPart }) => {
+    const validate = (httpPart === 'querystring' || httpPart === 'params' ? loose : strict).compile(schema);
+    return (data) => (validate(data) ? { value: data } : { error: validate.errors });
+  };
+}
 
 async function buildApp({ config, pool, storage, logger } = {}) {
   const app = Fastify({
@@ -17,9 +30,9 @@ async function buildApp({ config, pool, storage, logger } = {}) {
     trustProxy: config.trustProxy,
     bodyLimit: 1024 * 1024,
     genReqId: (req) => { const h = req.headers['x-request-id']; return typeof h === 'string' && /^[\w-]{8,64}$/.test(h) ? h : crypto.randomUUID(); },
-    ajv: { customOptions: { removeAdditional: false, coerceTypes: true, useDefaults: true, allErrors: false } },
   });
 
+  app.setValidatorCompiler(makeValidatorCompiler());
   app.decorate('config', config);
   app.decorate('pool', pool);
   app.decorate('storage', storage);
@@ -37,6 +50,7 @@ async function buildApp({ config, pool, storage, logger } = {}) {
   await app.register(require('./modules/rbac/routes'));
   await app.register(require('./modules/audit/routes'));
   await app.register(require('./modules/catalog/routes'));
+  await app.register(require('./modules/catalog/admin-routes'));
   await app.register(require('./modules/media/routes'));
   await app.register(require('./modules/integrations/routes'));
   await app.register(require('./modules/dashboard/routes'));

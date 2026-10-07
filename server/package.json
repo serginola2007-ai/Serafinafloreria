@@ -1,7 +1,7 @@
 {
   "name": "serafina-server",
   "version": "1.0.0",
-  "description": "Backend de Serafina Florer\u00eda (Fastify + PostgreSQL)",
+  "description": "Backend de Serafina Florería (Fastify + PostgreSQL)",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
@@ -13,7 +13,7 @@
     "import-legacy-catalog": "node scripts/import-legacy-catalog.js",
     "test": "NODE_ENV=test node --test --test-concurrency=1 --test-reporter=spec test/*.test.js",
     "check": "node scripts/check-syntax.js",
-    "e2e": "NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/panel.e2e.js"
+    "e2e": "NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/panel.e2e.js && NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/site.e2e.js && NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/catalog.e2e.js"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +27,8 @@
     "@fastify/multipart": "^10.1.2",
     "@fastify/rate-limit": "^11.2.0",
     "@fastify/static": "^10.1.5",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
     "argon2": "^0.45.1",
     "fastify": "^5.12.5",
     "pg": "^8.23.1"

@@ -28,3 +28,18 @@ npm test                        # requiere TEST_DATABASE_URL (default: postgres:
 
 ## Sin definir (requisitos para producción)
 Ver sección 16 de `docs/ARQUITECTURA.md` y `../render.yaml`. IVA/datos fiscales: **no hay tasas hardcodeadas**; `tax_categories` está vacía hasta que el contador confirme.
+
+## Panel `/admin/` y catálogo (Fases 3b y 3c)
+- `/admin/` lo sirve este mismo backend (HTML+CSS+JS modular en `../admin/`, sin framework, sin `innerHTML`, CSP estricta).
+  Módulos registrados en `admin/assets/js/core/nav.js`; solo existen los que funcionan de punta a punta.
+- Catálogo editable: categorías, productos, variantes con precio entero en PYG, historial de precios, imágenes (S3), publicar/despublicar/archivar.
+  Un producto solo se publica si tiene categoría, variante activa con precio e imagen. Nada se borra: se archiva.
+- Sitio público: `JAVA/api-config.js` → `window.SERAFINA_API_URL`. Vacío = comportamiento original. Con URL, el catálogo sale de la base y,
+  si la API falla o tarda más de 4 s, se usa `catalogo-datos.js` como respaldo.
+- Las imágenes originales viven en el sitio público (`PUBLIC_URL/IMAGENES/...`); las subidas desde el panel van al object storage.
+
+## Pruebas
+```bash
+npm test        # 117 pruebas de integración contra PostgreSQL real
+npm run e2e     # 3 recorridos en Chromium real (panel, sitio público ↔ API, catálogo). Requiere Playwright (PLAYWRIGHT_NODE_PATH)
+```
