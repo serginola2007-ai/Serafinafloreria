@@ -39,6 +39,7 @@ async function buildApp({ config, pool, storage, logger } = {}) {
   await app.register(require('./modules/catalog/routes'));
   await app.register(require('./modules/media/routes'));
   await app.register(require('./modules/integrations/routes'));
+  await app.register(require('./modules/dashboard/routes'));
 
   // El panel (/admin/) lo sirve este mismo backend cuando existe el directorio.
   const adminDir = path.join(__dirname, '..', '..', 'admin');

@@ -12,7 +12,8 @@
     "create-admin": "node scripts/create-admin.js",
     "import-legacy-catalog": "node scripts/import-legacy-catalog.js",
     "test": "NODE_ENV=test node --test --test-concurrency=1 --test-reporter=spec test/*.test.js",
-    "check": "node scripts/check-syntax.js"
+    "check": "node scripts/check-syntax.js",
+    "e2e": "NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/panel.e2e.js"
   },
   "keywords": [],
   "author": "",

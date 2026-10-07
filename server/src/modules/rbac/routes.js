@@ -14,6 +14,12 @@ module.exports = async function rbacRoutes(app) {
     return { data: rows, modules };
   });
 
+  // Lista liviana de roles para los selectores de usuarios (no expone permisos).
+  app.get('/api/v1/roles/options', { config: access.anyPerm('roles.view', 'usuarios.create', 'usuarios.edit') }, async () => {
+    const { rows } = await pool.query('SELECT code, name, is_superuser FROM roles ORDER BY id');
+    return { data: rows.map((r) => ({ code: r.code, name: r.name, isSuperuser: r.is_superuser })) };
+  });
+
   app.get('/api/v1/roles', { config: access.perm('roles.view') }, async () => {
     const { rows } = await pool.query(
       `SELECT r.code, r.name, r.description, r.is_system, r.is_superuser,

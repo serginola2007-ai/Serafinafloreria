@@ -42,11 +42,17 @@ module.exports = async function usersRoutes(app) {
     if (rows[0].n === 0) throw conflict('No se puede quitar al último Administrador activo', 'LAST_ADMIN');
   }
 
-  app.get('/api/v1/users', { config: access.perm('usuarios.view'), schema: { querystring: querySchema } }, async (req) => {
+  const SORTS = { name: 'u.full_name', email: 'u.email', role: 'r.name', lastLogin: 'u.last_login_at', created: 'u.created_at' };
+  const listQuery = { ...querySchema, properties: { ...querySchema.properties,
+    sort: { type: 'string', enum: Object.keys(SORTS), default: 'name' }, dir: { type: 'string', enum: ['asc', 'desc'], default: 'asc' },
+    active: { type: 'boolean' } } };
+  app.get('/api/v1/users', { config: access.perm('usuarios.view'), schema: { querystring: listQuery } }, async (req) => {
     const q = req.query; const args = []; let where = '';
-    if (q.q) { args.push(`%${q.q.replace(/[%_\\]/g, '\\$&')}%`); where = `WHERE (u.email::text ILIKE $1 OR u.full_name ILIKE $1)`; }
+    if (q.q) { args.push(`%${q.q.replace(/[%_\\]/g, '\\$&')}%`); where = 'WHERE (u.email::text ILIKE $1 OR u.full_name ILIKE $1)'; }
+    if (q.active !== undefined) { args.push(q.active); where += (where ? ' AND' : 'WHERE') + ` u.active = $${args.length}`; }
     const total = (await pool.query(`SELECT count(*)::int AS n FROM users u ${where}`, args)).rows[0].n;
-    const { rows } = await pool.query(`${USER_SQL} ${where} ORDER BY u.full_name, u.id LIMIT ${q.limit} OFFSET ${offset(q)}`, args);
+    const order = `${SORTS[q.sort]} ${q.dir === 'desc' ? 'DESC' : 'ASC'} NULLS LAST, u.id`; // columnas de una lista blanca
+    const { rows } = await pool.query(`${USER_SQL} ${where} ORDER BY ${order} LIMIT ${q.limit} OFFSET ${offset(q)}`, args);
     return { data: rows.map(shape), meta: meta(q, total) };
   });
 
