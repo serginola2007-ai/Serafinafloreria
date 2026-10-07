@@ -31,31 +31,31 @@ window.SERAFINA_CATALOGO = {
       id:          'romanticos',
       titulo:      'Románticos',
       descripcion: 'Ramos y arreglos diseñados para expresar amor. Flores frescas seleccionadas, cada pieza única.',
-      foto:        '../IMAGENES/Romanticos/arreglo_romanticos_1_ramo_cherry.jpg'
+      foto:        '../IMAGENES/Romanticos/arreglo_romanticos_1_ramo_cherry.png'
     },
     {
       id:          'pequenosdetalles',
       titulo:      'Pequeños Detalles',
       descripcion: 'Pequeños gestos que dicen mucho. Arreglos perfectos para sorprender en cualquier momento.',
-      foto:        '../IMAGENES/coleccion_pequeñosdetalles_logo.png'
+      foto:        '../IMAGENES/coleccion_pequeños_detalles.png'
     },
     {
       id:          'graduados',
       titulo:      'Graduados',
       descripcion: 'Celebrá el logro con flores. Arreglos especiales para acompañar el gran día.',
-      foto:        '../IMAGENES/coleccion_graduados_logo.jpeg'
+      foto:        '../IMAGENES/coleccion_graduados_portada.jpeg'
     },
     {
       id:          'nacimientos',
       titulo:      'Nacimientos',
       descripcion: 'Bienvenida al mundo con flores. Arreglos tiernos para recibir una nueva vida.',
-      foto:        '../IMAGENES/coleccion_nacimientos_logo.jpeg'
+      foto:        '../IMAGENES/coleccion_nacimientos_portada.jpeg'
     },
     {
       id:          'condolencias',
       titulo:      'Condolencias',
       descripcion: 'Acompañamos con respeto y delicadeza en los momentos difíciles.',
-      foto:        '../IMAGENES/coleccion_condolencias_logo.jpeg'
+      foto:        '../IMAGENES/coleccion_condolencias_portada.jpeg'
     }
   ],
 
@@ -476,7 +476,7 @@ window.SERAFINA_CATALOGO = {
       nombre:      'Arreglo 1',
       precio:      '210.000 Gs.',
       descripcion: 'Ramo con hortensias azules y rosas blancas, diseño tierno y delicado, ideal para dar la bienvenida a un nuevo bebé de una manera encantadora y llena de amor.',
-      fotos:       ['../IMAGENES/Nacimientos/Arr1_Naci_Ramo_Hortensia_Azul_y_Rosas_blancas.png']
+      fotos:       ['../IMAGENES/Nacimientos/Arr1_Naci_Ramo_Hortensia_Azul_y_Rosas_Blancas.png']
 },
 {
       id:          'nac-02',

@@ -508,64 +508,6 @@ const OfertaStrip = (() => {
   return { init, show, hide };
 })();
 /* ─────────────────────────────────────────────────────────────────────────
-   15. FEED DE INSTAGRAM
-   Usa imágenes propias del sitio como fallback mientras no haya API token.
-   Para integración real: proveer endpoint /api/instagram-feed que retorne
-   { items: [{ src, url, alt }] }
-   ───────────────────────────────────────────────────────────────────────── */
-const InstagramFeed = (() => {
-  const CFG = {
-    handle: 'serafinaflorespy',
-    count: 7,
-    profileUrl: 'https://www.instagram.com/serafinaflorespy/',
-    fallback: [
-      '../IMAGENES/dia-de-la-madre-12.jpg','../IMAGENES/dia-de-la-madre-13.jpg','../IMAGENES/dia-de-la-madre-14.jpg',
-      '../IMAGENES/dia-de-la-madre-18.jpg','../IMAGENES/dia-de-la-madre-8.jpg','../IMAGENES/dia-de-la-madre-7.jpg','../IMAGENES/dia-de-la-madre-36.jpg',
-    ],
-  };
-  function _buildGrid(container, items) {
-    container.innerHTML = '';
-    items.slice(0, CFG.count).forEach((item, i) => {
-      const a = document.createElement('a');
-      a.href = item.url || CFG.profileUrl;
-      a.target = '_blank'; a.rel = 'noopener noreferrer';
-      a.className = 'ig-feed-item reveal' + (i > 0 ? ' d' + Math.min(i, 4) : '');
-      a.setAttribute('aria-label', 'Ver en Instagram');
-      const img = document.createElement('img');
-      img.src = item.src; img.alt = item.alt || 'Serafina Florería · @serafinaflorespy';
-      img.loading = 'lazy'; img.decoding = 'async';
-      const ov = document.createElement('div');
-      ov.className = 'ig-feed-overlay';
-      ov.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".5" fill="white" stroke="none"/></svg><span>Instagram</span>';
-      a.appendChild(img); a.appendChild(ov);
-      container.appendChild(a);
-    });
-    Reveal.init();
-  }
-  function _skeletons(container) {
-    container.innerHTML = '';
-    for (let i = 0; i < CFG.count; i++) {
-      const d = document.createElement('div');
-      d.className = 'ig-feed-item ig-feed-skeleton';
-      container.appendChild(d);
-    }
-  }
-  async function init() {
-    const container = $('#igFeedGrid');
-    if (!container) return;
-    _skeletons(container);
-    try {
-      const r = await fetch('/api/instagram-feed');
-      if (!r.ok) throw new Error();
-      const data = await r.json();
-      _buildGrid(container, data.items);
-    } catch (_) {
-      _buildGrid(container, CFG.fallback.map(src => ({ src, url: CFG.profileUrl, alt: 'Arreglo floral · Serafina Florería' })));
-    }
-  }
-  return { init };
-})();
-/* ─────────────────────────────────────────────────────────────────────────
    16. FAQ — acordeón accesible
    ───────────────────────────────────────────────────────────────────────── */
 const FAQ = (() => {
@@ -907,7 +849,6 @@ document.addEventListener('DOMContentLoaded', () => {
   GaleriaLightbox.init();
   ShareBtn.init();
   OfertaStrip.init();
-  InstagramFeed.init();
   FAQ.init();
   Countdown.init();
   Calculadora.init();
