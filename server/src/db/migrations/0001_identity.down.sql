@@ -1,0 +1,10 @@
+DROP TABLE settings;
+DROP TABLE audit_logs;
+DROP FUNCTION audit_logs_immutable();
+DROP TABLE sessions;
+DROP TABLE user_permissions;
+DROP TABLE users;
+DROP TABLE role_permissions;
+DROP TABLE permissions;
+DROP TABLE roles;
+DROP FUNCTION set_updated_at();
