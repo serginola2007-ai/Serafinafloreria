@@ -90,19 +90,21 @@ module.exports = async function catalogAdminRoutes(app) {
   /* ───────── Productos ───────── */
   const SORTS = { name: 'p.name', created: 'p.created_at', updated: 'p.updated_at', order: 'p.sort_order' };
   app.get('/api/v1/products', { config: access.perm('productos.view'), schema: { querystring: { ...querySchema, properties: { ...querySchema.properties,
-    categoryId: id, status: { type: 'string', enum: ['all', 'published', 'inactive', 'review', 'archived'], default: 'all' },
+    categoryId: id, stockable: { type: 'boolean' }, kind: { type: 'string', enum: KINDS }, status: { type: 'string', enum: ['all', 'published', 'inactive', 'review', 'archived'], default: 'all' },
     sort: { type: 'string', enum: Object.keys(SORTS), default: 'order' }, dir: { type: 'string', enum: ['asc', 'desc'], default: 'asc' } } } } }, async (req) => {
     const q = req.query; const conds = []; const args = [];
     const add = (sql, v) => { args.push(v); conds.push(sql.replace('?', `$${args.length}`)); };
     if (q.q) { args.push(`%${q.q.replace(/[%_\\]/g, '\\$&')}%`); const n = args.length; conds.push(`(p.name ILIKE $${n} OR p.legacy_id ILIKE $${n} OR p.sku ILIKE $${n})`); }
     if (q.categoryId) add('p.category_id = ?', q.categoryId);
+    if (q.stockable !== undefined) add('p.is_stockable = ?', q.stockable);
+    if (q.kind) add('p.kind = ?', q.kind);
     const st = { published: 'p.archived_at IS NULL AND NOT p.needs_review AND p.active', inactive: 'p.archived_at IS NULL AND NOT p.needs_review AND NOT p.active',
       review: 'p.archived_at IS NULL AND p.needs_review', archived: 'p.archived_at IS NOT NULL' }[q.status];
     if (st) conds.push(st); else if (q.status === 'all') conds.push('p.archived_at IS NULL');
     const where = conds.length ? 'WHERE ' + conds.join(' AND ') : '';
     const total = (await pool.query(`SELECT count(*)::int AS n FROM products p ${where}`, args)).rows[0].n;
     const { rows } = await pool.query(
-      `SELECT p.id, p.legacy_id, p.name, p.kind, p.active, p.needs_review, p.archived_at, p.sort_order, p.updated_at, c.id AS cat_id, c.name AS cat_name,
+      `SELECT p.id, p.legacy_id, p.name, p.kind, p.unit, p.is_stockable, p.active, p.needs_review, p.archived_at, p.sort_order, p.updated_at, c.id AS cat_id, c.name AS cat_name,
               (SELECT count(*) FROM product_variants v WHERE v.product_id = p.id AND v.active)::int AS variants,
               (SELECT min(price_pyg) FROM product_variants v WHERE v.product_id = p.id AND v.active) AS price_from,
               (SELECT max(price_pyg) FROM product_variants v WHERE v.product_id = p.id AND v.active) AS price_to,
@@ -110,25 +112,26 @@ module.exports = async function catalogAdminRoutes(app) {
          FROM products p LEFT JOIN product_categories c ON c.id = p.category_id
          LEFT JOIN LATERAL (SELECT m.storage, m.storage_key FROM product_media pm JOIN media m ON m.id = pm.media_id AND m.archived_at IS NULL WHERE pm.product_id = p.id ORDER BY pm.sort_order, m.id LIMIT 1) t ON true
          ${where} ORDER BY ${SORTS[q.sort]} ${q.dir === 'desc' ? 'DESC' : 'ASC'}, p.id LIMIT ${q.limit} OFFSET ${offset(q)}`, args);
-    return { data: rows.map((p) => ({ id: p.id, legacyId: p.legacy_id, name: p.name, kind: p.kind, status: S.statusOf(p), category: p.cat_id ? { id: p.cat_id, name: p.cat_name } : null,
+    return { data: rows.map((p) => ({ id: p.id, legacyId: p.legacy_id, name: p.name, kind: p.kind, unit: p.unit, stockable: p.is_stockable, status: S.statusOf(p), category: p.cat_id ? { id: p.cat_id, name: p.cat_name } : null,
       variants: p.variants, priceFrom: p.price_from, priceTo: p.price_to, thumbUrl: url(p), updatedAt: p.updated_at })), meta: meta(q, total) };
   });
 
   app.get('/api/v1/products/:id', { config: access.perm('productos.view'), schema: { params: idParams } }, async (req) => productDetail(pool, req.params.id));
 
-  app.post('/api/v1/products', { config: access.perm('productos.create'), schema: { body: { type: 'object', required: ['name', 'categoryId', 'variants'], additionalProperties: false, properties: {
+  app.post('/api/v1/products', { config: access.perm('productos.create'), schema: { body: { type: 'object', required: ['name', 'categoryId'], additionalProperties: false, properties: {
     name: text(120), description: { type: ['string', 'null'], maxLength: 2000 }, categoryId: id, kind: { type: 'string', enum: KINDS, default: 'finished' }, sku: { type: ['string', 'null'], maxLength: 60 },
-    variants: { type: 'array', minItems: 1, maxItems: 20, items: { type: 'object', required: ['label', 'pricePyg'], additionalProperties: false, properties: { label: text(60), pricePyg: price, sku: { type: ['string', 'null'], maxLength: 60 } } } },
+    variants: { type: 'array', minItems: 0, maxItems: 20, default: [], items: { type: 'object', required: ['label', 'pricePyg'], additionalProperties: false, properties: { label: text(60), pricePyg: price, sku: { type: ['string', 'null'], maxLength: 60 } } } },
     mediaIds: { type: 'array', maxItems: 12, uniqueItems: true, items: id, default: [] }, publish: { type: 'boolean', default: false } } } } }, async (req, reply) => {
     const b = req.body;
+    if (b.kind === 'finished' && !b.variants.length) throw badRequest('Un producto terminado necesita al menos una variante con precio', undefined, 'VARIANT_REQUIRED');
     if (new Set(b.variants.map((v) => v.label.trim().toLowerCase())).size !== b.variants.length) throw badRequest('Hay variantes con el mismo nombre', undefined, 'DUPLICATE_VARIANT');
     const out = await withTransaction(pool, async (tx) => {
       await S.assertCategory(tx, b.categoryId); await S.assertMedia(tx, b.mediaIds);
       const slug = await S.uniqueSlug(tx, 'products', b.name);
       const { rows } = await tx.query(
         `INSERT INTO products(slug, name, description, category_id, kind, sku, is_sellable, active, sort_order)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,false,(SELECT COALESCE(max(sort_order),0)+1 FROM products)) RETURNING id`,
-        [slug, b.name.trim(), b.description ?? null, b.categoryId, b.kind, b.sku || null, b.kind === 'finished']);
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,(SELECT COALESCE(max(sort_order),0)+1 FROM products)) RETURNING id`,
+        [slug, b.name.trim(), b.description ?? null, b.categoryId, b.kind, b.sku || null, b.kind === 'finished', b.kind !== 'finished']);
       const pid = rows[0].id;
       for (const [i, v] of b.variants.entries()) {
         const vr = await tx.query('INSERT INTO product_variants(product_id, label, sku, price_pyg, sort_order) VALUES ($1,$2,$3,$4,$5) RETURNING id', [pid, v.label.trim(), v.sku || null, v.pricePyg, i]);

@@ -9,6 +9,11 @@ types.setTypeParser(20, (v) => {
   return n;
 });
 
+// NUMERIC (OID 1700) se usa solo para cantidades (3 decimales) y porcentajes: se parsea a Number.
+types.setTypeParser(1700, (v) => Number(v));
+// DATE (OID 1082) se mantiene como texto 'YYYY-MM-DD' (sin corrimientos de zona horaria).
+types.setTypeParser(1082, (v) => v);
+
 function createPool(config) {
   const pool = new Pool({
     connectionString: config.databaseUrl,

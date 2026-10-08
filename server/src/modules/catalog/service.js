@@ -17,11 +17,12 @@ const statusOf = (p) => (p.archived_at ? 'archived' : p.needs_review ? 'review' 
 /** Un producto solo se publica si está completo. Devuelve la lista de faltantes. */
 async function publishProblems(db, productId) {
   const { rows } = await db.query(
-    `SELECT p.category_id, p.needs_review,
+    `SELECT p.category_id, p.needs_review, p.kind,
             (SELECT count(*) FROM product_variants v WHERE v.product_id = p.id AND v.active)::int AS variants,
             (SELECT count(*) FROM product_media pm JOIN media m ON m.id = pm.media_id AND m.archived_at IS NULL AND m.is_public WHERE pm.product_id = p.id)::int AS images
        FROM products p WHERE p.id = $1`, [productId]);
   const p = rows[0]; const missing = [];
+  if (p.kind !== 'finished') return missing; // insumos/flores no se publican en la web: solo existen para inventario y recetas
   if (!p.category_id) missing.push('categoría');
   if (!p.variants) missing.push('al menos una variante con precio activa');
   if (!p.images) missing.push('al menos una imagen');

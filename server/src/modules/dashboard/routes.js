@@ -26,6 +26,22 @@ module.exports = async function dashboardRoutes(app) {
       const { rows } = await pool.query(`SELECT count(*) FILTER (WHERE active)::int AS active, count(*) FILTER (WHERE NOT active)::int AS inactive FROM users`);
       out.users = rows[0];
     }
+    if (can(req, 'inventario.view')) {
+      const { rows } = await pool.query(
+        `SELECT count(*) FILTER (WHERE l.on_hand = 0)::int AS out,
+                count(*) FILTER (WHERE l.on_hand > 0 AND l.min_stock > 0 AND l.on_hand - l.reserved <= l.min_stock)::int AS low,
+                COALESCE(sum(round(l.on_hand * p.avg_cost_pyg)), 0)::bigint AS value
+           FROM products p JOIN inventory_levels l ON l.product_id = p.id WHERE p.is_stockable AND p.archived_at IS NULL`);
+      out.inventory = rows[0];
+    }
+    if (can(req, 'compras.view', 'finanzas.view')) {
+      const { rows } = await pool.query(
+        `SELECT COALESCE(sum(total_pyg - paid_pyg), 0)::bigint AS payable,
+                COALESCE(sum(total_pyg - paid_pyg) FILTER (WHERE due_date < CURRENT_DATE), 0)::bigint AS overdue,
+                (SELECT count(*)::int FROM purchase_orders WHERE status IN ('enviada','parcial')) AS open_orders
+           FROM payables WHERE paid_pyg < total_pyg`);
+      out.purchasing = rows[0];
+    }
     if (can(req, 'marketing.view', 'analytics.view', 'configuracion.view')) {
       const list = [...registry.values()];
       out.integrations = { total: list.length, withCredentials: list.filter((a) => a.status === 'credentials_present').length };
