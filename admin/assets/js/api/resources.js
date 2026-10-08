@@ -35,3 +35,23 @@ export const mediaApi = {
   list: (q) => get('/media', q),
   upload: (file, altText) => { const f = new FormData(); if (altText) f.append('altText', altText); f.append('isPublic', 'true'); f.append('file', file); return post('/media', undefined, { form: f }); },
 };
+
+export const inventoryApi = {
+  items: (q) => get('/inventory/items', q), item: (id) => get(`/inventory/items/${id}`),
+  enroll: (b) => post('/inventory/items', b), settings: (id, b) => put(`/inventory/items/${id}/settings`, b),
+  movements: (q) => get('/inventory/movements', q), adjust: (b) => post('/inventory/adjustments', b),
+  waste: (b) => post('/inventory/waste', b), wasteReport: (q) => get('/inventory/waste', q),
+  wasteReasons: () => get('/waste-reasons'), createWasteReason: (name) => post('/waste-reasons', { name }), updateWasteReason: (id, b) => patch(`/waste-reasons/${id}`, b),
+  alerts: () => get('/inventory/alerts'),
+};
+export const suppliersApi = {
+  list: (q) => get('/suppliers', q), get: (id) => get(`/suppliers/${id}`), create: (b) => post('/suppliers', b), update: (id, b) => patch(`/suppliers/${id}`, b), archive: (id) => del(`/suppliers/${id}`),
+  link: (id, pid, supplierSku) => put(`/suppliers/${id}/products/${pid}`, { supplierSku: supplierSku || null }), unlink: (id, pid) => del(`/suppliers/${id}/products/${pid}`),
+  priceHistory: (id, productId) => get(`/suppliers/${id}/price-history`, { productId }),
+};
+export const purchasingApi = {
+  list: (q) => get('/purchase-orders', q), get: (id) => get(`/purchase-orders/${id}`), create: (b) => post('/purchase-orders', b), update: (id, b) => put(`/purchase-orders/${id}`, b),
+  send: (id) => post(`/purchase-orders/${id}/send`), cancel: (id, reason) => post(`/purchase-orders/${id}/cancel`, { reason }), close: (id) => post(`/purchase-orders/${id}/close`),
+  receive: (id, b) => post(`/purchase-orders/${id}/receive`, b),
+  payables: (q) => get('/payables', q), payable: (id) => get(`/payables/${id}`), pay: (id, b) => post(`/payables/${id}/payments`, b), methods: () => get('/payment-methods'),
+};
