@@ -51,17 +51,11 @@ async function lockAndCheckStock(tx, totals, locationId) {
   }
 }
 
-async function createSale(tx, req, b) {
-  const user = req.user;
+/** Valida ítems y calcula importes. Precios y vigencia SIEMPRE desde la base (nunca del cliente). Compartido por ventas y pedidos. */
+async function priceLines(tx, req, b) {
   const lineDiscounts = sum(b.items.map((i) => i.discountPyg ?? 0)); const orderDiscount = b.discountPyg ?? 0;
   if ((lineDiscounts > 0 || orderDiscount > 0) && !req.permissions.has('ventas.discount')) throw forbidden('No tenés permiso para aplicar descuentos', 'DISCOUNT_FORBIDDEN');
   const delivery = money(b.deliveryFeePyg ?? 0, 'Costo de delivery');
-
-  if (b.customerId) {
-    const { rowCount } = await tx.query('SELECT 1 FROM customers WHERE id = $1 AND archived_at IS NULL', [b.customerId]);
-    if (!rowCount) throw badRequest('Cliente inexistente o archivado', undefined, 'UNKNOWN_CUSTOMER');
-  }
-  // Variantes: precio y vigencia SIEMPRE desde la base (nunca del cliente).
   const { rows: vrows } = await tx.query(
     `SELECT v.id, v.label, v.price_pyg, v.active, v.recipe_enabled, p.id AS product_id, p.name, p.is_sellable, p.is_stockable, p.active AS product_active, p.archived_at
        FROM product_variants v JOIN products p ON p.id = v.product_id WHERE v.id = ANY($1::bigint[])`, [[...new Set(b.items.map((i) => i.variantId))]]);
@@ -76,10 +70,19 @@ async function createSale(tx, req, b) {
     if (d > gross) throw badRequest(`El descuento de “${v.name}” supera su importe`, { variantId: v.id }, 'DISCOUNT_TOO_HIGH');
     return { ...it, v, unit: v.price_pyg, discount: d, total: gross - d, description: v.label && v.label !== 'Único' ? `${v.name} (${v.label})` : v.name };
   });
-  const subtotal = sum(lines.map((l) => l.qty * l.unit)) ;
+  const subtotal = sum(lines.map((l) => l.qty * l.unit));
   const discount = lineDiscounts + orderDiscount;
   if (discount > subtotal) throw badRequest('El descuento no puede superar el subtotal', undefined, 'DISCOUNT_TOO_HIGH');
-  const total = subtotal - discount + delivery;
+  return { variants, lines, subtotal, discount, delivery, total: subtotal - discount + delivery };
+}
+
+async function createSale(tx, req, b) {
+  const user = req.user;
+  if (b.customerId) {
+    const { rowCount } = await tx.query('SELECT 1 FROM customers WHERE id = $1 AND archived_at IS NULL', [b.customerId]);
+    if (!rowCount) throw badRequest('Cliente inexistente o archivado', undefined, 'UNKNOWN_CUSTOMER');
+  }
+  const { variants, lines, subtotal, discount, delivery, total } = await priceLines(tx, req, b);
 
   // Pagos
   const pays = b.payments ?? []; const methods = await paymentMethods(tx, pays.map((p) => p.methodCode));
@@ -170,4 +173,4 @@ async function addPayment(tx, req, saleId, { methodCode, amountPyg, reference })
   return { paymentId: pay.id, balancePyg: balance - amountPyg };
 }
 
-module.exports = { createSale, voidSale, addPayment, paymentMethods };
+module.exports = { createSale, voidSale, addPayment, paymentMethods, priceLines, planConsumption, lockAndCheckStock };

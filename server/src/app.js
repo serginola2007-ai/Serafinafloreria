@@ -60,6 +60,10 @@ async function buildApp({ config, pool, storage, logger } = {}) {
   await app.register(require('./modules/recipes/routes'));
   await app.register(require('./modules/cash/routes'));
   await app.register(require('./modules/sales/routes'));
+  await app.register(require('./modules/orders/routes'));
+  await app.register(require('./modules/orders/public-routes'));
+  await app.register(require('./modules/production/routes'));
+  await app.register(require('./modules/delivery/routes'));
   await app.register(require('./modules/dashboard/routes'));
 
   // El panel (/admin/) lo sirve este mismo backend cuando existe el directorio.
