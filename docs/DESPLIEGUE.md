@@ -32,3 +32,6 @@ Para subir imágenes necesitás un almacenamiento compatible con S3 (Cloudflare 
 - Configurá backups de la base (plan pago) y una política de respaldo propia.
 - IVA y datos fiscales: pendientes del contador; el sistema no emite documentos fiscales.
 - La migración del catálogo (65 productos) se ejecuta con `npm run import-legacy-catalog`; revisá los productos marcados "a revisar".
+
+## Alternativa de prueba sin pagar: `render.free.yaml`
+Para ver el sistema funcionando sin cargar tarjeta (no apto para datos reales): en **New → Blueprint** poné **Blueprint Path** = `render.free.yaml`. Usa planes gratuitos (base que expira, servicio que se duerme, sin Shell). Las migraciones y el primer administrador se ejecutan al arrancar usando `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_NAME` y `BOOTSTRAP_ADMIN_PASSWORD`; **borrá la contraseña de las variables** apenas entres. Cargá también `API_URL`, `ADMIN_URL` y `PUBLIC_URL` como en el paso 2.
