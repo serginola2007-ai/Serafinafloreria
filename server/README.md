@@ -86,3 +86,8 @@ npm run e2e     # 3 recorridos en Chromium real (panel, sitio público ↔ API, 
 - **Eventos** (`/api/v1/events`): casamiento, corporativo, etc., ligados a un cliente, con fecha, lugar y estado.
 - **Cotizaciones** (`/api/v1/quotations`): borrador → enviada → aceptada/rechazada → convertida. Los productos del catálogo toman SIEMPRE el precio del servidor; los ítems libres (montaje, decoración) llevan precio manual. Cualquier descuento exige `ventas.discount`. Una cotización enviada vence en `valid_until` y ya no puede aceptarse.
 - **Conversión a pedido**: solo si está aceptada y **todos** sus ítems son del catálogo (los libres no tienen stock ni receta); crea un pedido `pendiente` canal `evento` con el descuento acordado. Las cotizaciones con ítems libres quedan como documento comercial (no es un comprobante fiscal).
+
+## Reportes y exportaciones (Fase 3i)
+
+- `GET /api/v1/reports/overview?from&to` (`reportes.view`): ventas por día, canal y método de cobro, mejores clientes y productos más vendidos. Costo y margen aparecen solo con `finanzas.view`.
+- CSV (`reportes.export`; gastos además exige `finanzas.view`): `sales.csv`, `expenses.csv`, `inventory.csv`, `receivables.csv`. UTF-8 con BOM, fórmulas neutralizadas (`=`, `+`, `-`, `@`), `no-store` y cada exportación queda en la auditoría.

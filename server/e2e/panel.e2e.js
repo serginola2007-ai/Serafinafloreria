@@ -51,7 +51,7 @@ let step = 0; const ok = (m) => console.log(`  ✔ ${++step}. ${m}`);
     ok('cambia la contraseña y entra al panel');
 
     const navText = await page.locator('.sidebar .nav-link').allTextContents();
-    assert.deepEqual(navText, ['Dashboard', 'Productos', 'Categorías', 'Nueva venta', 'Historial de ventas', 'Cuentas por cobrar', 'Caja', 'Clientes', 'Pedidos', 'Producción', 'Entregas', 'Eventos', 'Stock', 'Movimientos', 'Merma', 'Órdenes de compra', 'Proveedores', 'Cuentas por pagar', 'Finanzas', 'Usuarios', 'Roles y permisos', 'Auditoría', 'Integraciones']);
+    assert.deepEqual(navText, ['Dashboard', 'Productos', 'Categorías', 'Nueva venta', 'Historial de ventas', 'Cuentas por cobrar', 'Caja', 'Clientes', 'Pedidos', 'Producción', 'Entregas', 'Eventos', 'Stock', 'Movimientos', 'Merma', 'Órdenes de compra', 'Proveedores', 'Cuentas por pagar', 'Finanzas', 'Reportes', 'Usuarios', 'Roles y permisos', 'Auditoría', 'Integraciones']);
     await page.waitForSelector('.stat');
     assert.doesNotMatch(await page.textContent('#view'), /false|undefined|\[object|NaN/, 'texto basura en el dashboard');
     await shot('02-dashboard');

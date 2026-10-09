@@ -46,6 +46,10 @@ let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
     assert.equal(Number((await app.pool.query(`SELECT COALESCE(sum(amount_pyg),0) AS s FROM cash_movements`)).rows[0].s), 100000);
     ok('anular devuelve el efectivo a la caja y el resultado vuelve a 441.600');
 
+    await page.click('a.nav-link:has-text("Reportes")'); await page.waitForSelector('h1:has-text("Reportes")'); await page.waitForSelector('text=Productos más vendidos');
+    assert.match(await page.textContent('#view'), /Bouquet Romántico/); assert.match(await page.textContent('#view'), /441\.600 Gs\./);
+    const [dl] = await Promise.all([page.waitForEvent('download'), page.click('a:has-text("Ventas (CSV)")')]); assert.match(dl.suggestedFilename(), /^ventas_.*\.csv$/);
+    ok('reportes: top de productos con margen real y descarga de CSV de ventas');
     await page.click('.user-btn'); await page.click('button:has-text("Cerrar sesión")'); await page.waitForSelector('#login-email');
     await page.fill('#login-email', 'vendedor@serafina.test'); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.sidebar');
     assert.ok(!(await page.locator('.sidebar .nav-link').allTextContents()).includes('Finanzas'));

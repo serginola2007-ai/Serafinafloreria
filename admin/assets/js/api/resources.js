@@ -102,3 +102,5 @@ export const eventsApi = {
   quotations: (q) => get('/quotations', q), quotation: (id) => get(`/quotations/${id}`), createQuotation: (b) => post('/quotations', b), updateQuotation: (id, b) => put(`/quotations/${id}`, b),
   send: (id) => post(`/quotations/${id}/send`), accept: (id) => post(`/quotations/${id}/accept`), reject: (id, reason) => post(`/quotations/${id}/reject`, { reason }), convert: (id, b) => post(`/quotations/${id}/convert`, b),
 };
+
+export const reportsApi = { overview: (q) => get('/reports/overview', q) };
