@@ -20,9 +20,9 @@ Guardá y esperá el redeploy. El panel queda en `<API_URL>/admin/`. La verifica
 ## 3. Crear el primer administrador (sin contraseña por defecto)
 En el servicio → **Shell**:
 ```
-npm run create-admin
+npm run create-admin -- --email tu@correo.com --name "Tu Nombre"
 ```
-El comando te pide correo y contraseña; el sistema te obliga a cambiarla al entrar la primera vez. No hay credenciales en el código.
+Pide la contraseña (mínimo 12 caracteres, sin eco). Si la Shell no es interactiva, definí temporalmente la variable `BOOTSTRAP_ADMIN_PASSWORD`, ejecutá el comando y **borrala** después. Al entrar por primera vez el sistema te obliga a cambiarla. No hay credenciales en el código.
 
 ## 4. Imágenes (opcional)
 Para subir imágenes necesitás un almacenamiento compatible con S3 (Cloudflare R2, Backblaze B2, AWS S3). Cambiá `STORAGE_DRIVER` a `s3` y cargá `S3_ENDPOINT`, `S3_BUCKET`, `S3_ACCESS_KEY`, `S3_SECRET_KEY`, `S3_PUBLIC_BASE_URL`. Sin eso el panel funciona, pero no se pueden subir imágenes ni comprobantes de entrega.
