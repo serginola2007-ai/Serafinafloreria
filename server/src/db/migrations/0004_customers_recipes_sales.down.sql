@@ -1,0 +1,16 @@
+DROP TABLE sale_refunds;
+DROP TABLE payments;
+DROP FUNCTION payments_immutable();
+DROP TABLE sale_items;
+DROP TABLE sales;
+ALTER TABLE payable_payments DROP COLUMN cash_movement_id;
+DROP TABLE cash_movements;
+DROP FUNCTION cash_movements_immutable();
+DROP TABLE cash_sessions;
+DROP TABLE recipe_extra_costs;
+DROP TABLE recipe_components;
+ALTER TABLE product_variants DROP COLUMN recipe_enabled;
+DROP TABLE recipients;
+DROP TABLE customer_dates;
+DROP TABLE customer_addresses;
+DROP TABLE customers;

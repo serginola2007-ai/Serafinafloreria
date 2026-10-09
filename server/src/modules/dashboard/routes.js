@@ -26,6 +26,21 @@ module.exports = async function dashboardRoutes(app) {
       const { rows } = await pool.query(`SELECT count(*) FILTER (WHERE active)::int AS active, count(*) FILTER (WHERE NOT active)::int AS inactive FROM users`);
       out.users = rows[0];
     }
+    if (can(req, 'ventas.view')) {
+      const { rows } = await pool.query(
+        `SELECT count(*) FILTER (WHERE created_at >= CURRENT_DATE)::int AS today_count,
+                COALESCE(sum(total_pyg) FILTER (WHERE created_at >= CURRENT_DATE), 0)::bigint AS today_total,
+                count(*) FILTER (WHERE created_at >= date_trunc('month', CURRENT_DATE))::int AS month_count,
+                COALESCE(sum(total_pyg) FILTER (WHERE created_at >= date_trunc('month', CURRENT_DATE)), 0)::bigint AS month_total,
+                COALESCE(sum(total_pyg - paid_pyg) FILTER (WHERE paid_pyg < total_pyg), 0)::bigint AS receivable,
+                COALESCE(sum(total_pyg - paid_pyg) FILTER (WHERE paid_pyg < total_pyg AND credit_due_date < CURRENT_DATE), 0)::bigint AS receivable_overdue
+           FROM sales WHERE status = 'confirmada'`);
+      out.sales = { ...rows[0], averageTicket: rows[0].month_count ? Math.round(rows[0].month_total / rows[0].month_count) : 0 };
+    }
+    if (can(req, 'caja.view')) {
+      const { rows } = await pool.query(`SELECT s.id, s.opened_at, COALESCE((SELECT sum(amount_pyg) FROM cash_movements m WHERE m.session_id = s.id), 0)::bigint AS expected FROM cash_sessions s WHERE s.closed_at IS NULL`);
+      out.cash = rows[0] ? { open: true, openedAt: rows[0].opened_at, expectedCashPyg: rows[0].expected } : { open: false };
+    }
     if (can(req, 'inventario.view')) {
       const { rows } = await pool.query(
         `SELECT count(*) FILTER (WHERE l.on_hand = 0)::int AS out,

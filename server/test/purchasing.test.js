@@ -163,8 +163,15 @@ describe('proveedores, órdenes de compra, recepción y cuentas por pagar', () =
     await app.pool.query(`UPDATE payables SET due_date = CURRENT_DATE - 3 WHERE id = $1`, [payableId]);
     const od = (await api(admin, 'GET', '/api/v1/payables?status=overdue')).json();
     assert.equal(od.data.length, 1); assert.equal(od.data[0].status, 'overdue'); assert.equal(od.balancePyg, 50000);
+    // el efectivo sale de la caja: sin caja abierta no se puede; con caja abierta queda como movimiento
+    assert.equal((await api(admin, 'POST', `/api/v1/payables/${payableId}/payments`, { amountPyg: 50000, methodCode: 'efectivo' })).json().error.code, 'CASH_CLOSED');
+    await api(admin, 'POST', '/api/v1/cash/open', { openingAmountPyg: 30000 });
+    assert.equal((await api(admin, 'POST', `/api/v1/payables/${payableId}/payments`, { amountPyg: 50000, methodCode: 'efectivo' })).json().error.code, 'INSUFFICIENT_CASH', 'no se puede pagar más efectivo del que hay en caja');
+    await api(admin, 'POST', '/api/v1/cash/movements', { type: 'ingreso', amountPyg: 70000, concept: 'Aporte para pagar proveedor' });
     const p2 = await api(admin, 'POST', `/api/v1/payables/${payableId}/payments`, { amountPyg: 50000, methodCode: 'efectivo' });
     assert.equal(p2.json().status, 'paid');
+    assert.equal((await api(admin, 'GET', '/api/v1/cash/current')).json().session.expectedCashPyg, 50000, '30.000 + 70.000 − 50.000');
+    assert.equal((await app.pool.query(`SELECT count(*)::int AS n FROM payable_payments WHERE cash_movement_id IS NOT NULL`)).rows[0].n, 1);
     const pa = (await api(admin, 'GET', `/api/v1/payables/${payableId}`)).json();
     assert.equal(pa.status, 'paid'); assert.equal(pa.payments.length, 2); assert.equal(pa.balancePyg, 0);
     assert.equal((await api(admin, 'POST', `/api/v1/payables/${payableId}/payments`, { amountPyg: 1, methodCode: 'efectivo' })).json().error.code, 'OVERPAYMENT');

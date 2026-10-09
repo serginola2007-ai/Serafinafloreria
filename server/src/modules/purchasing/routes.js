@@ -12,12 +12,8 @@ const qty = { type: 'number', exclusiveMinimum: 0, maximum: 1000000000 };
 const pyg = { type: 'integer', minimum: 0, maximum: 1000000000000 };
 const date = { type: 'string', format: 'date' };
 
-/** Número correlativo atómico (sin huecos duplicados aun con concurrencia). */
-async function nextNumber(tx, key, prefix) {
-  const { rows } = await tx.query(
-    `INSERT INTO number_sequences(key, last_value) VALUES ($1, 1) ON CONFLICT (key) DO UPDATE SET last_value = number_sequences.last_value + 1 RETURNING last_value`, [key]);
-  return `${prefix}-${String(rows[0].last_value).padStart(6, '0')}`;
-}
+const { nextNumber } = require('../../lib/sequences');
+const cash = require('../cash/service');
 const lineTotal = (q, cost) => Number((BigInt(inv.toMilli(q)) * BigInt(cost) + 500n) / 1000n); // qty (3 dec) × costo, redondeado a Gs enteros
 const today = () => new Date().toISOString().slice(0, 10);
 const addDays = (d, n) => { const x = new Date(d + 'T00:00:00Z'); x.setUTCDate(x.getUTCDate() + n); return x.toISOString().slice(0, 10); };
@@ -224,7 +220,7 @@ module.exports = async function purchasingRoutes(app) {
       payments: pays.map((x) => ({ id: x.id, amountPyg: x.amount_pyg, method: x.method, reference: x.reference, paidAt: x.paid_at, user: x.user_name })) };
   });
 
-  // Pago a proveedor. El vínculo con la caja (efectivo que sale de la caja) se agrega con el módulo de caja.
+  // Pago a proveedor. Si es en efectivo, sale de la caja abierta (movimiento 'pago_proveedor').
   app.post('/api/v1/payables/:id/payments', { config: access.perm('finanzas.edit'), schema: { params: idParams, body: { type: 'object', required: ['amountPyg', 'methodCode'], additionalProperties: false, properties: {
     amountPyg: { type: 'integer', minimum: 1, maximum: 1000000000000 }, methodCode: { type: 'string', pattern: '^[a-z_]+$', maxLength: 30 }, reference: { type: ['string', 'null'], maxLength: 100 } } } } }, async (req, reply) => {
     const b = req.body;
@@ -233,9 +229,15 @@ module.exports = async function purchasingRoutes(app) {
       if (!rows.length) throw notFound('Cuenta por pagar no encontrada');
       const pa = rows[0]; const balance = pa.total_pyg - pa.paid_pyg;
       if (b.amountPyg > balance) throw conflict(`El pago supera el saldo pendiente (${balance})`, 'OVERPAYMENT', { balancePyg: balance });
-      const { rows: mt } = await tx.query('SELECT id FROM payment_methods WHERE code = $1 AND active', [b.methodCode]);
+      const { rows: mt } = await tx.query('SELECT id, affects_cash FROM payment_methods WHERE code = $1 AND active', [b.methodCode]);
       if (!mt.length) throw badRequest('Método de pago inexistente o inactivo', { methodCode: b.methodCode }, 'UNKNOWN_METHOD');
-      const { rows: [pay] } = await tx.query('INSERT INTO payable_payments(payable_id, amount_pyg, method_id, reference, user_id) VALUES ($1,$2,$3,$4,$5) RETURNING id', [pa.id, b.amountPyg, mt[0].id, b.reference?.trim() || null, req.user.id]);
+      // El efectivo sale del cajón: exige caja abierta y saldo suficiente, y queda como movimiento de caja.
+      let cashMovementId = null;
+      if (mt[0].affects_cash) {
+        const session = await cash.requireOpenSession(tx);
+        cashMovementId = await cash.addCashMovement(tx, { sessionId: session.id, type: 'pago_proveedor', amountPyg: -b.amountPyg, concept: `Pago a proveedor (cuenta #${pa.id})`, referenceType: 'payable', referenceId: pa.id, userId: req.user.id });
+      }
+      const { rows: [pay] } = await tx.query('INSERT INTO payable_payments(payable_id, amount_pyg, method_id, reference, user_id, cash_movement_id) VALUES ($1,$2,$3,$4,$5,$6) RETURNING id', [pa.id, b.amountPyg, mt[0].id, b.reference?.trim() || null, req.user.id, cashMovementId]);
       await tx.query('UPDATE payables SET paid_pyg = paid_pyg + $2 WHERE id = $1', [pa.id, b.amountPyg]);
       await audit(tx, req, { action: 'payable.payment', entity: 'payable', entityId: pa.id, after: { paymentId: pay.id, amountPyg: b.amountPyg, method: b.methodCode, balanceAfterPyg: balance - b.amountPyg } });
       return { paymentId: pay.id, balancePyg: balance - b.amountPyg, status: balance - b.amountPyg === 0 ? 'paid' : 'partial' };
