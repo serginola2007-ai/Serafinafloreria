@@ -38,17 +38,8 @@ services:
         sync: false
       - key: ADMIN_URL
         sync: false
-      # Object storage compatible con S3 (necesario solo para subir imágenes desde el panel):
+      # Archivos (imágenes del catálogo): empezá con "none" (el panel funciona, sin subir imágenes). Para activarlo,
+      # cambiá a "s3" y cargá S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY, S3_SECRET_KEY y S3_PUBLIC_BASE_URL (ver docs/DESPLIEGUE.md).
       - key: STORAGE_DRIVER
-        value: s3
-      - key: S3_ENDPOINT
-        sync: false
-      - key: S3_BUCKET
-        sync: false
-      - key: S3_ACCESS_KEY
-        sync: false
-      - key: S3_SECRET_KEY
-        sync: false
-      - key: S3_PUBLIC_BASE_URL
-        sync: false
+        value: none
       # Integraciones: se agregan solo cuando existan credenciales reales (ver server/.env.example).
