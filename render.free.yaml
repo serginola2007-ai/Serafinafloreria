@@ -1,0 +1,47 @@
+# Blueprint de PRUEBA con planes gratuitos de Render (para ver el sistema funcionando; NO para datos reales).
+# Limitaciones habituales del plan gratuito (verificar en https://render.com/docs/free):
+#   - la base PostgreSQL gratuita EXPIRA (a los ~30 días) y no tiene backups: se pierden los datos;
+#   - el servicio se "duerme" tras un rato sin visitas y tarda en despertar;
+#   - no hay Shell ni preDeployCommand: las migraciones y el primer administrador se ejecutan al arrancar.
+# Para crear el administrador, definí BOOTSTRAP_ADMIN_EMAIL, BOOTSTRAP_ADMIN_NAME y BOOTSTRAP_ADMIN_PASSWORD
+# en el primer despliegue y BORRÁ BOOTSTRAP_ADMIN_PASSWORD después (el comando se niega si ya hay un administrador).
+databases:
+  - name: serafina-db-test
+    databaseName: serafina
+    user: serafina
+    plan: free
+    postgresMajorVersion: "16"
+
+services:
+  - type: web
+    name: serafina-test
+    runtime: node
+    rootDir: server
+    plan: free
+    buildCommand: npm ci --omit=dev
+    startCommand: npm run migrate && npm run seed && ( [ -n "$BOOTSTRAP_ADMIN_PASSWORD" ] && npm run create-admin -- --email "$BOOTSTRAP_ADMIN_EMAIL" --name "$BOOTSTRAP_ADMIN_NAME" || true ) && npm start
+    healthCheckPath: /ready
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        fromDatabase: { name: serafina-db-test, property: connectionString }
+      - key: TRUST_PROXY
+        value: "true"
+      - key: STORAGE_DRIVER
+        value: none
+      - key: PUBLIC_URL
+        sync: false
+      - key: API_URL
+        sync: false
+      - key: ADMIN_URL
+        sync: false
+      - key: BOOTSTRAP_ADMIN_EMAIL
+        sync: false
+      - key: BOOTSTRAP_ADMIN_NAME
+        sync: false
+      - key: BOOTSTRAP_ADMIN_PASSWORD
+        sync: false

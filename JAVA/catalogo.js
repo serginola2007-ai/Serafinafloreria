@@ -258,8 +258,24 @@ const Catalogo = (() => {
     document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModal(); });
   }
 
-  function init() {
-    datos = window.SERAFINA_CATALOGO;
+  /* Lee el catálogo de la API (base de datos). Devuelve null si no está configurada, falla, tarda o viene inválida:
+     en ese caso se mantiene el catálogo local de catalogo-datos.js (respaldo). */
+  async function cargarDesdeApi() {
+    const base = (window.SERAFINA_API_URL || '').replace(/\/+$/, '');
+    if (!base) return null;
+    const ctl = new AbortController();
+    const timer = setTimeout(() => ctl.abort(), 4000);
+    try {
+      const r = await fetch(base + '/api/v1/public/catalog', { signal: ctl.signal, headers: { Accept: 'application/json' } });
+      if (!r.ok) return null;
+      const d = await r.json();
+      const valido = d && Array.isArray(d.secciones) && Array.isArray(d.productos) && d.secciones.length > 0 && d.productos.length > 0;
+      return valido ? d : null;
+    } catch (_) { return null; } finally { clearTimeout(timer); }
+  }
+
+  async function init() {
+    datos = (await cargarDesdeApi()) || window.SERAFINA_CATALOGO;
     if (!datos || !Array.isArray(datos.secciones)) {
       const contenedor = $('#catalogo-cats');
       if (contenedor) contenedor.innerHTML = '<div class="catalogo-vacio"><h2>No se pudieron cargar los datos</h2><p>Verificá que el archivo JAVA/catalogo-datos.js esté presente.</p></div>';

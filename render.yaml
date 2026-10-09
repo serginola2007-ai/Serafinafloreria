@@ -1,0 +1,45 @@
+# Blueprint de Render para Serafina (backend + PostgreSQL administrado).
+# REQUISITOS DE DESPLIEGUE (verificar contra la documentación vigente de Render antes de aplicar):
+#   - PostgreSQL con backups y sin expiración: usar un plan de pago (el gratuito expira y no es apto para producción).
+#   - Web service que no se "duerma" y con preDeployCommand: normalmente requiere un plan de pago.
+#   - Los valores marcados `sync: false` se cargan a mano en el panel de Render (nunca en el repositorio).
+# Los nombres de plan abajo son marcadores: confirmar los vigentes en https://render.com/docs
+databases:
+  - name: serafina-db
+    databaseName: serafina
+    user: serafina
+    plan: basic-256mb          # CONFIRMAR plan vigente (pago)
+    postgresMajorVersion: "16"
+
+services:
+  - type: web
+    name: serafina-api
+    runtime: node
+    rootDir: server
+    plan: starter              # CONFIRMAR plan vigente (pago)
+    buildCommand: npm ci --omit=dev
+    preDeployCommand: npm run migrate && npm run seed
+    startCommand: npm start
+    healthCheckPath: /ready
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        fromDatabase: { name: serafina-db, property: connectionString }
+      - key: TRUST_PROXY
+        value: "true"
+      # PENDIENTES de definir con el dominio final (el servidor NO arranca sin ellas):
+      - key: PUBLIC_URL
+        sync: false
+      - key: API_URL
+        sync: false
+      - key: ADMIN_URL
+        sync: false
+      # Archivos (imágenes del catálogo): empezá con "none" (el panel funciona, sin subir imágenes). Para activarlo,
+      # cambiá a "s3" y cargá S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY, S3_SECRET_KEY y S3_PUBLIC_BASE_URL (ver docs/DESPLIEGUE.md).
+      - key: STORAGE_DRIVER
+        value: none
+      # Integraciones: se agregan solo cuando existan credenciales reales (ver server/.env.example).

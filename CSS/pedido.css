@@ -653,7 +653,7 @@ footer { background:var(--footer-bg); padding:48px 72px; display:flex; justify-c
    40. CONTADOR REGRESIVO
    ══════════════════════════════════════════════════════════════ */
 .countdown-section{background:var(--rosa-dk);padding:56px 72px;position:relative;overflow:hidden}
-.countdown-section::before{content:'';position:absolute;inset:0;background-image:url('../IMAGENES/dia-de-la-madre-36.jpg');background-size:cover;background-position:center;opacity:.08;pointer-events:none}
+.countdown-section::before{content:'';position:absolute;inset:0;background-image:url('../IMAGENES/Dia_de_la_madre/dia-de-la-madre-36.jpg');background-size:cover;background-position:center;opacity:.08;pointer-events:none}
 .countdown-inner{position:relative;z-index:1;display:grid;grid-template-columns:1fr auto;align-items:center;gap:60px;max-width:1200px;margin:0 auto}
 .countdown-text{}
 .countdown-eyebrow{font-size:9px;letter-spacing:4.5px;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:12px}

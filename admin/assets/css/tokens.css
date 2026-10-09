@@ -1,0 +1,23 @@
+/* Tokens del panel. Misma identidad que el sitio público (rosa Serafina, crema, dorado). */
+:root {
+  --rosa: #9a4a5a; --rosa-dk: #6d2f3d; --rosa-lt: #d4a0a8; --rosa-pale: #f5eaec;
+  --gold: #c9a96e;
+  --bg: #f7f3ee; --surface: #ffffff; --surface-2: #faf6f0; --border: #e6dcd0; --border-strong: #cfc2b2;
+  --text: #2b1d16; --text-2: #6b5b52; --text-3: #8f8179;
+  --primary: var(--rosa); --primary-hover: var(--rosa-dk); --primary-text: #fff;
+  --ok: #2f7a4f; --ok-bg: #e5f3ea; --warn: #9a6a14; --warn-bg: #fbf1dc; --err: #b3261e; --err-bg: #fbe7e5; --info: #2a5f8a; --info-bg: #e3eef7;
+  --sidebar-bg: #2b1d16; --sidebar-text: #e9dfd4; --sidebar-muted: #a99b8f; --sidebar-active: rgba(255,255,255,.1);
+  --shadow: 0 1px 0 rgba(43,29,22,.04);
+  --shadow-lg: 0 10px 40px rgba(43,29,22,.25);
+  --radius: 3px; --radius-sm: 2px;
+  --serif: 'Cormorant Garamond', Georgia, serif; --sans: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: ui-monospace, 'JetBrains Mono', SFMono-Regular, Menlo, Consolas, monospace;
+  --sidebar-w: 248px; --topbar-h: 46px; --focus: 0 0 0 2px rgba(154,74,90,.45);
+}
+:root[data-theme="dark"] {
+  --bg: #130d0a; --surface: #1e1612; --surface-2: #241a15; --border: #3a2c24; --border-strong: #55433a;
+  --text: #f1e8de; --text-2: #bdaea3; --text-3: #94857a;
+  --primary: #c1707f; --primary-hover: #d4a0a8; --primary-text: #1a0f0b;
+  --ok: #7fd1a0; --ok-bg: #16301f; --warn: #e8c274; --warn-bg: #34280f; --err: #f2a29c; --err-bg: #3a1714; --info: #8dbfe8; --info-bg: #14283a;
+  --sidebar-bg: #0c0705; --shadow: 0 1px 0 rgba(0,0,0,.3);
+}

@@ -1,0 +1,31 @@
+name: server-ci
+on:
+  push:
+    paths: ['server/**', '.github/workflows/server-ci.yml', 'JAVA/catalogo-datos.js']
+  pull_request:
+    paths: ['server/**', '.github/workflows/server-ci.yml', 'JAVA/catalogo-datos.js']
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: public.ecr.aws/docker/library/postgres:16   # espejo oficial en AWS: evita el límite de descargas anónimas de Docker Hub
+        env: { POSTGRES_USER: serafina, POSTGRES_PASSWORD: serafina_dev, POSTGRES_DB: serafina_test }
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U serafina" --health-interval 5s --health-timeout 5s --health-retries 10
+    defaults: { run: { working-directory: server } }
+    env:
+      TEST_DATABASE_URL: postgres://serafina:serafina_dev@localhost:5432/serafina_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: server/package-lock.json }
+      - run: npm ci
+      - run: npm run check
+      - run: npm audit --omit=dev --audit-level=high
+      - name: Migraciones desde cero + rollback completo + re-aplicación
+        env: { DATABASE_URL: 'postgres://serafina:serafina_dev@localhost:5432/serafina_test', NODE_ENV: development }
+        run: |
+          npm run migrate && npm run migrate:down -- 99 && npm run migrate && npm run seed
+      - run: npm test
