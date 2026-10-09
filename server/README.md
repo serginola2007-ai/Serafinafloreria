@@ -74,3 +74,9 @@ npm run e2e     # 3 recorridos en Chromium real (panel, sitio público ↔ API, 
 - **Pedido web** `POST /api/v1/public/orders`: sin sesión, con límite por IP y campo trampa; devuelve solo número y total. Aún no está conectado al formulario del sitio público.
 - **Comprobante**: el repartidor asignado sube una foto privada (`POST /deliveries/:id/proof`); solo `delivery.edit` obtiene la URL firmada temporal.
 - Pendiente: geocodificación/mapas reales, eventos y cotizaciones.
+
+## Finanzas (Fase 3g)
+
+- **Gastos** (`/api/v1/expenses`, `/expense-categories`): categorías definidas por el negocio (no se siembran datos de ejemplo). Un gasto en efectivo sale de la caja abierta (movimiento `gasto`); se anula con motivo y el efectivo vuelve. Nunca se borran.
+- **Resumen** (`GET /api/v1/finance/summary?from&to`): ventas − costo de lo vendido (congelado al vender) − gastos. Si hay líneas sin costo conocido, margen y resultado son `null`: no se inventan.
+- Las compras de mercadería no son gasto (entran al inventario y llegan como costo vendido). Es un resumen de gestión, **no un balance ni un cálculo de impuestos**: IVA y régimen fiscal siguen pendientes del contador.

@@ -32,6 +32,7 @@ export const ROUTES = [
   { path: '/proveedores', id: 'suppliers', label: 'Proveedores', icon: 'users', group: 'Compras', anyOf: ['proveedores.view'], load: () => import('../modules/suppliers/index.js') },
   { path: '/proveedores/:id', id: 'supplier-detail', navId: 'suppliers', label: 'Proveedor', group: null, anyOf: ['proveedores.view'], load: () => import('../modules/suppliers/detail.js') },
   { path: '/pagar', id: 'payables', label: 'Cuentas por pagar', icon: 'shield', group: 'Compras', anyOf: ['compras.view', 'finanzas.view'], load: () => import('../modules/purchasing/payables.js') },
+  { path: '/finanzas', id: 'finance', label: 'Finanzas', icon: 'shield', group: 'Finanzas', anyOf: ['finanzas.view'], load: () => import('../modules/finance/index.js') },
   { path: '/usuarios', id: 'users', label: 'Usuarios', icon: 'users', group: 'Administración', anyOf: ['usuarios.view'], load: () => import('../modules/users/index.js') },
   { path: '/roles', id: 'roles', label: 'Roles y permisos', icon: 'shield', group: 'Administración', anyOf: ['roles.view'], load: () => import('../modules/roles/index.js') },
   { path: '/auditoria', id: 'audit', label: 'Auditoría', icon: 'list', group: 'Administración', anyOf: ['auditoria.view'], load: () => import('../modules/audit/index.js') },

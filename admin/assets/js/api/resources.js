@@ -91,3 +91,8 @@ export const deliveryApi = {
   deliver: (id, b) => post(`/deliveries/${id}/deliver`, b ?? {}), fail: (id, reason) => post(`/deliveries/${id}/fail`, { reason }), reschedule: (id, b) => post(`/deliveries/${id}/reschedule`, b),
   couriers: () => get('/delivery-couriers'), uploadProof: (id, file) => { const f = new FormData(); f.append('file', file); return post(`/deliveries/${id}/proof`, undefined, { form: f }); }, proofUrl: (id) => get(`/deliveries/${id}/proof`), routes: (q) => get('/delivery-routes', q), createRoute: (b) => post('/delivery-routes', b),
 };
+
+export const financeApi = {
+  summary: (q) => get('/finance/summary', q), expenses: (q) => get('/expenses', q), createExpense: (b) => post('/expenses', b), voidExpense: (id, reason) => post(`/expenses/${id}/void`, { reason }),
+  categories: () => get('/expense-categories'), createCategory: (name) => post('/expense-categories', { name }), updateCategory: (id, b) => patch(`/expense-categories/${id}`, b),
+};
