@@ -1,7 +1,7 @@
 'use strict';
 const { test, describe, before, after } = require('node:test');
 const assert = require('node:assert/strict');
-const { makeApp, userWithRole, call } = require('./helpers');
+const { makeApp, userWithRole, call, multipart, PNG_1PX } = require('./helpers');
 const { setupFlowers } = require('./fixtures');
 const inv = require('../src/modules/inventory/service');
 
@@ -155,6 +155,21 @@ describe('pedidos: reserva de stock, producción, delivery y cierre a venta', ()
     const rs = await Promise.all(ids.map((id) => confirm(id)));
     assert.equal(rs.filter((r) => r.statusCode === 200).length, 1, rs.map((r) => r.statusCode).join());
     for (const id of ids) await api(vend, 'POST', `/api/v1/orders/${id}/cancel`, { reason: 'fin concurrencia' });
+  });
+
+  test('comprobante de entrega: lo sube el repartidor asignado (privado), no otros roles ni archivos que no son imagen', async () => {
+    const o = (await mk()).json(); await confirm(o.id); const d = await detail(o.id); const del = d.delivery.id;
+    const repId = (await app.pool.query(`SELECT id FROM users WHERE email='r@test.local'`)).rows[0].id;
+    const up = (s, opts) => { const m = multipart(opts); return app.inject({ method: 'POST', url: `/api/v1/deliveries/${del}/proof`, payload: m.payload, headers: { cookie: s.cookie, 'x-csrf-token': s.csrf, 'content-type': m.contentType } }); };
+    assert.equal((await up(rep, { content: PNG_1PX })).statusCode, 403, 'todavía no le asignaron la entrega');
+    await api(admin, 'POST', `/api/v1/deliveries/${del}/assign`, { courierId: repId });
+    assert.equal((await up(vend, { content: PNG_1PX })).statusCode, 403);
+    assert.equal((await up(rep, { filename: 'x.pdf', mime: 'application/pdf', content: Buffer.from('%PDF-1.4 x') })).statusCode, 400);
+    const ok = await up(rep, { content: PNG_1PX }); assert.equal(ok.statusCode, 200, ok.body);
+    const m = (await app.pool.query('SELECT is_public FROM media WHERE id = $1', [ok.json().mediaId])).rows[0]; assert.equal(m.is_public, false);
+    assert.equal((await api(rep, 'GET', `/api/v1/deliveries/${del}/proof`)).statusCode, 403, 'el repartidor no consulta comprobantes');
+    assert.equal((await api(admin, 'GET', `/api/v1/deliveries/${del}/proof`)).statusCode, 200);
+    await api(vend, 'POST', `/api/v1/orders/${o.id}/cancel`, { reason: 'fin de prueba' });
   });
 
   test('INVARIANTES: inventario íntegro, reservas = niveles, pagos y auditoría consistentes', async () => {

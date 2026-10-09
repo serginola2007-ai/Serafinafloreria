@@ -89,5 +89,5 @@ export const productionApi = {
 export const deliveryApi = {
   list: (q) => get('/deliveries', q), get: (id) => get(`/deliveries/${id}`), assign: (id, courierId) => post(`/deliveries/${id}/assign`, { courierId }), start: (id) => post(`/deliveries/${id}/start`),
   deliver: (id, b) => post(`/deliveries/${id}/deliver`, b ?? {}), fail: (id, reason) => post(`/deliveries/${id}/fail`, { reason }), reschedule: (id, b) => post(`/deliveries/${id}/reschedule`, b),
-  couriers: () => get('/delivery-couriers'), routes: (q) => get('/delivery-routes', q), createRoute: (b) => post('/delivery-routes', b),
+  couriers: () => get('/delivery-couriers'), uploadProof: (id, file) => { const f = new FormData(); f.append('file', file); return post(`/deliveries/${id}/proof`, undefined, { form: f }); }, proofUrl: (id) => get(`/deliveries/${id}/proof`), routes: (q) => get('/delivery-routes', q), createRoute: (b) => post('/delivery-routes', b),
 };

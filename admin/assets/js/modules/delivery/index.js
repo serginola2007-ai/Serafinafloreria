@@ -23,6 +23,12 @@ export default async function mount({ view, session }) {
     const btns = [];
     if (manager && !['entregado', 'cancelado'].includes(d.status)) btns.push(h('button', { class: 'btn sm', type: 'button', onclick: () => assignDialog(d) }, d.courier ? 'Cambiar repartidor' : 'Asignar'));
     if (d.courier && ['listo', 'asignado', 'reprogramado', 'no_entregado'].includes(d.status) && ['listo', 'reprogramado', 'no_entregado'].includes(d.orderStatus)) btns.push(h('button', { class: 'btn sm primary', type: 'button', onclick: run(() => deliveryApi.start(d.id), 'Salió a entregar') }, 'Salir a entregar'));
+    if (d.status === 'en_camino') {
+      const file = h('input', { type: 'file', accept: 'image/jpeg,image/png,image/webp', capture: 'environment', hidden: true, 'aria-label': `Foto comprobante ${d.orderNumber}` });
+      file.addEventListener('change', async () => { if (!file.files[0]) return; try { await deliveryApi.uploadProof(d.id, file.files[0]); toast('Comprobante guardado'); load(); } catch (e) { toast(e.message, 'err'); } });
+      btns.push(file, h('button', { class: 'btn sm', type: 'button', onclick: () => file.click() }, d.hasProof ? 'Cambiar foto' : 'Foto comprobante'));
+    }
+    if (manager && d.hasProof) btns.push(h('button', { class: 'btn sm', type: 'button', onclick: async () => { try { window.open((await deliveryApi.proofUrl(d.id)).url, '_blank', 'noopener'); } catch (e) { toast(e.message, 'err'); } } }, 'Ver comprobante'));
     if (d.status === 'en_camino') btns.push(h('button', { class: 'btn sm primary', type: 'button', onclick: () => deliverDialog(d) }, 'Entregado'), h('button', { class: 'btn sm danger', type: 'button', onclick: () => failDialog(d) }, 'No se pudo entregar'));
     if (!['entregado', 'cancelado'].includes(d.status)) btns.push(h('button', { class: 'btn sm', type: 'button', onclick: () => rescheduleDialog(d) }, 'Reprogramar'));
     return h('article', { class: 'card', style: 'padding:12px;display:grid;gap:6px' }, h('div', { style: 'display:flex;justify-content:space-between;gap:8px' }, h('strong', {}, d.recipient ?? '—'), badge(...(STATUS[d.status] ?? [d.status, '']))),

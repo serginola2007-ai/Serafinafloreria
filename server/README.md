@@ -72,4 +72,5 @@ npm run e2e     # 3 recorridos en Chromium real (panel, sitio público ↔ API, 
 - **Cierre**: al entregar (o retirar) se genera la **venta** con el costo congelado de producción; los cobros anticipados pasan a esa venta. Con saldo pendiente se exige cliente y vencimiento (cuentas por cobrar).
 - **Cancelación**: reembolsa lo cobrado (efectivo requiere caja abierta); si ya se produjo, hay que indicar si los materiales vuelven al stock o van a merma.
 - **Pedido web** `POST /api/v1/public/orders`: sin sesión, con límite por IP y campo trampa; devuelve solo número y total. Aún no está conectado al formulario del sitio público.
-- Pendiente: foto de comprobante subida por el repartidor (hoy se acepta un `proofMediaId` ya subido), geocodificación/mapas reales, eventos y cotizaciones.
+- **Comprobante**: el repartidor asignado sube una foto privada (`POST /deliveries/:id/proof`); solo `delivery.edit` obtiene la URL firmada temporal.
+- Pendiente: geocodificación/mapas reales, eventos y cotizaciones.

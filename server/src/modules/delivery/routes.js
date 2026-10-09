@@ -1,6 +1,9 @@
 'use strict';
+const crypto = require('node:crypto');
+const multipart = require('@fastify/multipart');
 const access = require('../../lib/access');
-const { notFound, conflict, badRequest } = require('../../lib/errors');
+const { inspectUpload, safeOriginalName } = require('../media/validate');
+const { notFound, conflict, badRequest, AppError } = require('../../lib/errors');
 const { withTransaction } = require('../../db/pool');
 const { audit } = require('../audit/audit');
 const S = require('./service');
@@ -11,7 +14,8 @@ const STATUSES = ['pendiente', 'asignado', 'listo', 'en_camino', 'entregado', 'n
 const ACTIVE = ['pendiente', 'asignado', 'listo', 'en_camino', 'no_entregado', 'reprogramado'];
 
 module.exports = async function deliveryRoutes(app) {
-  const { pool } = app;
+  const { pool, config, storage } = app;
+  await app.register(multipart, { limits: { fileSize: config.upload.maxBytes, files: 1, fields: 2, fieldSize: 200, parts: 4 } });
   const mapsLink = (d) => (d.lat != null && d.lng != null ? `https://www.google.com/maps/search/?api=1&query=${d.lat},${d.lng}` : d.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.address)}` : null);
   const shape = (d) => ({ id: d.id, orderId: d.order_id, orderNumber: d.number, orderStatus: d.order_status, status: d.status, courier: d.courier_id ? { id: d.courier_id, name: d.courier_name } : null,
     routeId: d.route_id, routePosition: d.route_position, scheduledDate: d.scheduled_date, timeSlot: d.time_slot, recipient: d.recipient_name, phone: d.recipient_phone, address: d.address, zone: d.zone, reference: d.reference,
@@ -55,6 +59,39 @@ module.exports = async function deliveryRoutes(app) {
     const { rows } = await pool.query(`SELECT DISTINCT u.id, u.full_name FROM users u JOIN roles r ON r.id = u.role_id
       WHERE u.active AND (r.is_superuser = false) AND EXISTS (SELECT 1 FROM role_permissions rp JOIN permissions p ON p.id = rp.permission_id WHERE rp.role_id = r.id AND p.code = 'delivery.own') ORDER BY u.full_name`);
     return { data: rows.map((u) => ({ id: u.id, name: u.full_name })) };
+  });
+
+  // Foto de comprobante de entrega: la sube quien opera la entrega (no necesita permiso general de medios). Siempre PRIVADA.
+  app.post('/api/v1/deliveries/:id/proof', { config: operate, schema: { params: idParams } }, async (req) => {
+    if (!storage.configured) throw new AppError(503, 'STORAGE_NOT_CONFIGURED', 'El almacenamiento de archivos no está configurado');
+    if (!req.isMultipart()) throw badRequest('Se esperaba multipart/form-data');
+    const { rows: [d] } = await pool.query('SELECT * FROM deliveries WHERE id = $1', [req.params.id]);
+    if (!d) throw notFound('Entrega no encontrada');
+    S.assertCanOperate(req, d);
+    const part = await req.file(); if (!part) throw badRequest('Falta el archivo');
+    const buffer = await part.toBuffer();
+    if (part.file.truncated) throw new AppError(413, 'PAYLOAD_TOO_LARGE', 'El archivo supera el tamaño permitido');
+    const info = inspectUpload({ filename: part.filename, mimetype: part.mimetype, buffer, isPublic: false });
+    if (info.error) throw badRequest(info.error, undefined, 'INVALID_FILE');
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(info.mime)) throw badRequest('El comprobante debe ser una imagen', undefined, 'INVALID_FILE');
+    const d0 = new Date(); const key = `delivery-proofs/${d0.getUTCFullYear()}/${String(d0.getUTCMonth() + 1).padStart(2, '0')}/${crypto.randomUUID()}.${info.ext}`;
+    await storage.put(key, buffer, { mime: info.mime });
+    try {
+      return await withTransaction(pool, async (tx) => {
+        const cur = await S.loadDelivery(tx, d.id);
+        if (cur.status === 'cancelado') throw conflict('La entrega está cancelada', 'INVALID_STATE');
+        const { rows: [m] } = await tx.query(`INSERT INTO media(storage, storage_key, mime, size_bytes, sha256, original_name, is_public, created_by) VALUES ('object',$1,$2,$3,$4,$5,false,$6) RETURNING id`,
+          [key, info.mime, buffer.length, crypto.createHash('sha256').update(buffer).digest('hex'), safeOriginalName(part.filename), req.user.id]);
+        await tx.query('UPDATE deliveries SET proof_media_id = $2 WHERE id = $1', [d.id, m.id]);
+        await audit(tx, req, { action: 'delivery.proof_uploaded', entity: 'delivery', entityId: d.id, after: { mediaId: m.id } });
+        return { ok: true, mediaId: m.id };
+      });
+    } catch (err) { await storage.remove(key).catch(() => {}); throw err; }
+  });
+  app.get('/api/v1/deliveries/:id/proof', { config: access.perm('delivery.edit'), schema: { params: idParams } }, async (req) => {
+    const { rows } = await pool.query('SELECT m.storage_key FROM deliveries d JOIN media m ON m.id = d.proof_media_id WHERE d.id = $1', [req.params.id]);
+    if (!rows.length) throw notFound('La entrega no tiene comprobante');
+    return { url: await storage.signedUrl(rows[0].storage_key, 300), expiresInSeconds: 300 };
   });
 
   /* ───────── Rutas ───────── */
