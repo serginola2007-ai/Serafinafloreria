@@ -8,7 +8,8 @@ const { makeApp, createUser, PASSWORD, PNG_1PX } = require('../test/helpers');
 const { importLegacyCatalog, loadLegacyCatalog } = require('../src/modules/catalog/import-legacy');
 const { withTransaction } = require('../src/db/pool');
 
-const REPO = path.resolve(__dirname, '..', '..'); const SHOTS = path.join(__dirname, 'screens'); fs.mkdirSync(SHOTS, { recursive: true });
+const REPO = path.resolve(__dirname, '..', '..'); const { clickNav } = require('./nav');
+const SHOTS = path.join(__dirname, 'screens'); fs.mkdirSync(SHOTS, { recursive: true });
 const MIME = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp' };
 let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
 
@@ -31,14 +32,14 @@ let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
   page.on('console', (m) => { if (['error', 'warning'].includes(m.type()) && !/fonts\.g|net::|Failed to load resource/.test(m.text())) problems.push(m.text()); });
   page.on('pageerror', (e) => problems.push('pageerror: ' + e.message));
   const shot = (x) => page.screenshot({ path: path.join(SHOTS, `c-${x}.png`) });
-  const login = async (email) => { await page.goto('http://127.0.0.1:4325/admin/'); await page.waitForSelector('#login-email'); await page.fill('#login-email', email); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.sidebar'); };
+  const login = async (email) => { await page.goto('http://127.0.0.1:4325/admin/'); await page.waitForSelector('#login-email'); await page.fill('#login-email', email); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.app-nav'); };
   const publicCat = async () => (await app.inject('/api/v1/public/catalog')).json();
 
   try {
     await login('admin@serafina.test');
-    const nav = await page.locator('.sidebar .nav-link').allTextContents();
+    const nav = await page.locator('.app-nav .nav-link').allTextContents();
     assert.ok(nav.includes('Productos') && nav.includes('Categorías'));
-    await page.click('a.nav-link:has-text("Productos")'); await page.waitForSelector('h1:has-text("Productos")'); await page.waitForSelector('table.table tbody tr');
+    await clickNav(page, 'Productos'); await page.waitForSelector('h1:has-text("Productos")'); await page.waitForSelector('table.table tbody tr');
     assert.match(await page.textContent('.pager'), /1–15 de 65/);
     await page.waitForFunction(() => [...document.querySelectorAll('.thumb')].some((i) => i.tagName === 'IMG' && i.complete && i.naturalWidth > 0));
     await shot('1-lista');
@@ -73,12 +74,12 @@ let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
     ok('precio con decimales/texto se rechaza en el formulario');
 
     // ── categoría + producto nuevo con imagen subida ──
-    await page.click('a.nav-link:has-text("Categorías")'); await page.waitForSelector('h1:has-text("Categorías")'); await page.waitForSelector('table.table tbody tr');
+    await clickNav(page, 'Categorías'); await page.waitForSelector('h1:has-text("Categorías")'); await page.waitForSelector('table.table tbody tr');
     await page.click('button:has-text("Nueva categoría")'); await page.fill('#c-name', 'Cumpleaños'); await page.click('.modal-foot button.primary');
     await page.waitForSelector('.toast:has-text("Categoría creada")'); await page.waitForSelector('td:has-text("Cumpleaños")');
     ok('crea categoría desde el panel');
 
-    await page.click('a.nav-link:has-text("Productos")'); await page.waitForSelector('h1:has-text("Productos")');
+    await clickNav(page, 'Productos'); await page.waitForSelector('h1:has-text("Productos")');
     await page.click('a:has-text("Nuevo producto")'); await page.waitForSelector('#p-name');
     await page.click('button:has-text("Crear y publicar")'); await page.waitForSelector('#p-name-err:not([hidden])');
     ok('validación de formulario: nombre obligatorio');
@@ -116,7 +117,7 @@ let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
     // ── rol Ventas: solo lectura ──
     await page.click('.user-btn'); await page.click('button:has-text("Cerrar sesión")'); await page.waitForSelector('#login-email');
     await login('vendedor@serafina.test');
-    await page.click('a.nav-link:has-text("Productos")'); await page.waitForSelector('table.table tbody tr');
+    await clickNav(page, 'Productos'); await page.waitForSelector('table.table tbody tr');
     assert.equal(await page.locator('a:has-text("Nuevo producto")').count(), 0);
     assert.equal(await page.locator('button:has-text("Archivar")').count(), 0);
     await page.click('a:has-text("Ver") >> nth=0'); await page.waitForSelector('#p-name');

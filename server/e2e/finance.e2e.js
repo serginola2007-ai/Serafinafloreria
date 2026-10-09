@@ -7,6 +7,7 @@ const { chromium } = require('playwright');
 const { makeApp, createUser, login: apiLogin, call, PASSWORD } = require('../test/helpers');
 const { setupFlowers } = require('../test/fixtures');
 
+const { clickNav } = require('./nav');
 const SHOTS = path.join(__dirname, 'screens'); fs.mkdirSync(SHOTS, { recursive: true });
 let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
 
@@ -26,8 +27,8 @@ let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
   page.on('pageerror', (e) => problems.push('pageerror: ' + e.message));
   const toast = (t) => page.waitForSelector(`.toast:has-text("${t}")`);
   try {
-    await page.goto('http://127.0.0.1:4330/admin/'); await page.fill('#login-email', 'admin@serafina.test'); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.sidebar');
-    await page.click('a.nav-link:has-text("Finanzas")'); await page.waitForSelector('h1:has-text("Finanzas")'); await page.waitForSelector('.stat:has-text("Ventas")');
+    await page.goto('http://127.0.0.1:4330/admin/'); await page.fill('#login-email', 'admin@serafina.test'); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.app-nav');
+    await clickNav(page, 'Finanzas'); await page.waitForSelector('h1:has-text("Finanzas")'); await page.waitForSelector('.stat:has-text("Ventas")');
     assert.match(await page.textContent('#view'), /441\.600 Gs\./); assert.doesNotMatch(await page.textContent('#view'), /\bfalse\b|undefined|NaN|\[object/);
     ok('el resumen muestra ventas 500.000, costo 58.400 y margen 441.600 (datos reales)');
 
@@ -46,13 +47,13 @@ let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
     assert.equal(Number((await app.pool.query(`SELECT COALESCE(sum(amount_pyg),0) AS s FROM cash_movements`)).rows[0].s), 100000);
     ok('anular devuelve el efectivo a la caja y el resultado vuelve a 441.600');
 
-    await page.click('a.nav-link:has-text("Reportes")'); await page.waitForSelector('h1:has-text("Reportes")'); await page.waitForSelector('text=Productos más vendidos');
+    await clickNav(page, 'Reportes'); await page.waitForSelector('h1:has-text("Reportes")'); await page.waitForSelector('text=Productos más vendidos');
     assert.match(await page.textContent('#view'), /Bouquet Romántico/); assert.match(await page.textContent('#view'), /441\.600 Gs\./);
     const [dl] = await Promise.all([page.waitForEvent('download'), page.click('a:has-text("Ventas (CSV)")')]); assert.match(dl.suggestedFilename(), /^ventas_.*\.csv$/);
     ok('reportes: top de productos con margen real y descarga de CSV de ventas');
     await page.click('.user-btn'); await page.click('button:has-text("Cerrar sesión")'); await page.waitForSelector('#login-email');
-    await page.fill('#login-email', 'vendedor@serafina.test'); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.sidebar');
-    assert.ok(!(await page.locator('.sidebar .nav-link').allTextContents()).includes('Finanzas'));
+    await page.fill('#login-email', 'vendedor@serafina.test'); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.app-nav');
+    assert.ok(!(await page.locator('.app-nav .nav-link').allTextContents()).includes('Finanzas'));
     await page.evaluate(() => { location.hash = '#/finanzas'; }); await page.waitForSelector('text=Sin acceso');
     assert.equal(await page.evaluate(async () => (await fetch('/api/v1/finance/summary', { credentials: 'same-origin' })).status), 403);
     ok('ventas no ve Finanzas (menú, URL ni API)');

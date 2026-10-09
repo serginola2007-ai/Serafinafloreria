@@ -8,6 +8,7 @@ const { makeApp, createUser, login: apiLogin, PASSWORD } = require('../test/help
 const { setupFlowers } = require('../test/fixtures');
 const inv = require('../src/modules/inventory/service');
 
+const { clickNav } = require('./nav');
 const SHOTS = path.join(__dirname, 'screens'); fs.mkdirSync(SHOTS, { recursive: true });
 let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
 
@@ -26,8 +27,8 @@ let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
   page.on('console', (m) => { if (['error', 'warning'].includes(m.type()) && !/fonts\.g|net::|Failed to load resource/.test(m.text())) problems.push(m.text()); });
   page.on('pageerror', (e) => problems.push('pageerror: ' + e.message));
   const shot = (x) => page.screenshot({ path: path.join(SHOTS, `s-${x}.png`) });
-  const login = async (email) => { await page.goto('http://127.0.0.1:4328/admin/'); await page.waitForSelector('#login-email'); await page.fill('#login-email', email); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.sidebar'); };
-  const go = async (label, h1) => { await page.click(`a.nav-link:has-text("${label}")`); await page.waitForSelector(`h1:has-text("${h1}")`); await page.waitForTimeout(250); };
+  const login = async (email) => { await page.goto('http://127.0.0.1:4328/admin/'); await page.waitForSelector('#login-email'); await page.fill('#login-email', email); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.app-nav'); };
+  const go = async (label, h1) => { await clickNav(page, label); await page.waitForSelector(`h1:has-text("${h1}")`); await page.waitForTimeout(250); };
   const toast = (t) => page.waitForSelector(`.toast:has-text("${t}")`);
   const noGarbage = async () => assert.doesNotMatch(await page.textContent('#view'), /\bfalse\b|undefined|\[object|NaN/);
   const addBouquet = async (times = 1) => { for (let i = 0; i < times; i++) await page.click('button.pos-card:has-text("Bouquet Romántico")'); };
@@ -35,7 +36,7 @@ let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
 
   try {
     await login('admin@serafina.test');
-    const nav = await page.locator('.sidebar .nav-link').allTextContents();
+    const nav = await page.locator('.app-nav .nav-link').allTextContents();
     for (const x of ['Nueva venta', 'Historial de ventas', 'Cuentas por cobrar', 'Caja', 'Clientes']) assert.ok(nav.includes(x), x);
 
     // ── 1. caja cerrada ──
@@ -126,12 +127,12 @@ let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
 
     // ── 11. permisos: florista y vendedor ──
     await page.click('.user-btn'); await page.click('button:has-text("Cerrar sesión")'); await page.waitForSelector('#login-email');
-    await page.fill('#login-email', 'florista@serafina.test'); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.sidebar');
-    const fNav = await page.locator('.sidebar .nav-link').allTextContents(); for (const x of ['Nueva venta', 'Historial de ventas', 'Caja', 'Clientes', 'Cuentas por cobrar']) assert.ok(!fNav.includes(x), `florista no debería ver ${x}`);
+    await page.fill('#login-email', 'florista@serafina.test'); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.app-nav');
+    const fNav = await page.locator('.app-nav .nav-link').allTextContents(); for (const x of ['Nueva venta', 'Historial de ventas', 'Caja', 'Clientes', 'Cuentas por cobrar']) assert.ok(!fNav.includes(x), `florista no debería ver ${x}`);
     for (const h of ['#/caja', '#/clientes', '#/ventas', '#/ventas/nueva']) { await page.evaluate((x) => { location.hash = x; }, h); await page.waitForSelector('text=Sin acceso'); }
     assert.equal(await page.evaluate(async () => (await fetch('/api/v1/sales', { credentials: 'same-origin' })).status), 403);
     await page.click('.user-btn'); await page.click('button:has-text("Cerrar sesión")'); await page.waitForSelector('#login-email');
-    await page.fill('#login-email', 'vendedor@serafina.test'); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.sidebar');
+    await page.fill('#login-email', 'vendedor@serafina.test'); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.app-nav');
     await go('Caja', 'Caja'); await page.waitForSelector('.stat'); assert.equal(await page.locator('button:has-text("Cerrar caja")').count(), 0); assert.equal(await page.locator('button:has-text("Retiro")').count(), 0);
     await go('Historial de ventas', 'Ventas'); await page.click('a:has-text("V-000002")'); await page.waitForSelector('h1:has-text("V-000002")');
     assert.doesNotMatch(await page.textContent('#view'), /Margen/); assert.equal(await page.locator('th:has-text("Costo")').count(), 0);
@@ -141,7 +142,7 @@ let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
     await page.setViewportSize({ width: 390, height: 850 }); await go2('Nueva venta', 'Nueva venta'); await page.waitForSelector('button.pos-card'); await page.click('button.pos-card'); await page.waitForTimeout(300);
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1), 'POS sin scroll horizontal'); await shot('7-movil-pos');
     ok('móvil: el POS no tiene scroll horizontal');
-    async function go2(label, h1) { await page.click('.menu-btn'); await page.click(`a.nav-link:has-text("${label}")`); await page.waitForSelector(`h1:has-text("${h1}")`); }
+    async function go2(label, h1) { await page.click('.menu-btn'); await clickNav(page, label); await page.waitForSelector(`h1:has-text("${h1}")`); }
 
     assert.deepEqual(problems, [], problems.join(' | ')); ok('sin errores de consola ni CSP');
     console.log('\nSALES E2E OK');

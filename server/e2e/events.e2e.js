@@ -7,6 +7,7 @@ const { chromium } = require('playwright');
 const { makeApp, createUser, login: apiLogin, call, PASSWORD } = require('../test/helpers');
 const { setupFlowers } = require('../test/fixtures');
 
+const { clickNav } = require('./nav');
 const SHOTS = path.join(__dirname, 'screens'); fs.mkdirSync(SHOTS, { recursive: true });
 let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
 const fut = (d) => new Date(Date.now() + d * 86400000).toISOString().slice(0, 10);
@@ -26,8 +27,8 @@ const fut = (d) => new Date(Date.now() + d * 86400000).toISOString().slice(0, 10
   const toast = (t) => page.waitForSelector(`.toast:has-text("${t}")`);
   const pick = async () => { await page.fill('input[aria-label="Buscar cliente"]', 'Empresa'); await page.click('.menu-item:has-text("Empresa Eventos SA")'); };
   try {
-    await page.goto('http://127.0.0.1:4331/admin/'); await page.fill('#login-email', 'admin@serafina.test'); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.sidebar');
-    await page.click('a.nav-link:has-text("Eventos")'); await page.waitForSelector('h1:has-text("Eventos y cotizaciones")');
+    await page.goto('http://127.0.0.1:4331/admin/'); await page.fill('#login-email', 'admin@serafina.test'); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.app-nav');
+    await clickNav(page, 'Eventos'); await page.waitForSelector('h1:has-text("Eventos y cotizaciones")');
     await page.click('button:has-text("Nuevo evento")'); await pick(); await page.fill('#ev-n', 'Boda Gómez'); await page.selectOption('#ev-t', 'casamiento'); await page.fill('#ev-v', 'Quinta Los Pinos'); await page.click('.modal-foot button.primary'); await toast('Evento creado');
     await page.waitForSelector('tr:has-text("Boda Gómez"), .card:has-text("Boda Gómez")'); ok('crea el evento Boda Gómez');
 
@@ -45,7 +46,7 @@ const fut = (d) => new Date(Date.now() + d * 86400000).toISOString().slice(0, 10
     await page.keyboard.press('Escape');
 
     // segunda cotización solo catálogo → conversión
-    await page.click('a.nav-link:has-text("Eventos")'); await page.click('a:has-text("Nueva cotización")'); await pick();
+    await clickNav(page, 'Eventos'); await page.click('a:has-text("Nueva cotización")'); await pick();
     await page.fill('input[aria-label="Buscar producto"]', 'Bouquet'); await page.click('.menu-item:has-text("Bouquet Romántico")'); await page.fill('#qf-v', fut(7)); await page.click('button:has-text("Crear cotización")'); await page.waitForSelector('h1:has-text("C-000002")');
     await page.click('button:has-text("Marcar como enviada")'); await page.waitForSelector('.badge:has-text("Enviada")'); await page.click('button:has-text("Cliente aceptó")'); await page.waitForSelector('.badge:has-text("Aceptada")');
     await page.click('button:has-text("Convertir en pedido")'); await page.fill('#qc-d', fut(10)); await page.click('.modal-foot button.primary'); await toast('Pedido P-000001 creado');

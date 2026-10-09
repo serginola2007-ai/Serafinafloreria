@@ -7,6 +7,7 @@ const { chromium } = require('playwright');
 const { makeApp, createUser, PASSWORD } = require('../test/helpers');
 const inv = require('../src/modules/inventory/service');
 
+const { clickNav } = require('./nav');
 const SHOTS = path.join(__dirname, 'screens'); fs.mkdirSync(SHOTS, { recursive: true });
 let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
 
@@ -23,15 +24,15 @@ let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
   page.on('console', (m) => { if (['error', 'warning'].includes(m.type()) && !/fonts\.g|net::|Failed to load resource/.test(m.text())) problems.push(m.text()); });
   page.on('pageerror', (e) => problems.push('pageerror: ' + e.message));
   const shot = (x) => page.screenshot({ path: path.join(SHOTS, `i-${x}.png`) });
-  const login = async (email) => { await page.goto('http://127.0.0.1:4327/admin/'); await page.waitForSelector('#login-email'); await page.fill('#login-email', email); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.sidebar'); };
-  const go = async (label, h1) => { await page.click(`a.nav-link:has-text("${label}")`); await page.waitForSelector(`h1:has-text("${h1}")`); await page.waitForTimeout(200); };
+  const login = async (email) => { await page.goto('http://127.0.0.1:4327/admin/'); await page.waitForSelector('#login-email'); await page.fill('#login-email', email); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.app-nav'); };
+  const go = async (label, h1) => { await clickNav(page, label); await page.waitForSelector(`h1:has-text("${h1}")`); await page.waitForTimeout(200); };
   const noGarbage = async () => assert.doesNotMatch(await page.textContent('#view'), /\bfalse\b|undefined|\[object|NaN/);
   const toast = (t) => page.waitForSelector(`.toast:has-text("${t}")`);
   const pickProduct = async (text) => { await page.fill('input[aria-label="Buscar producto"]', text.split(' ')[0]); await page.waitForSelector(`select[aria-label="Producto"] option:has-text("${text}")`, { state: 'attached' }); await page.selectOption('select[aria-label="Producto"]', { label: text }); };
 
   try {
     await login('admin@serafina.test');
-    const nav = await page.locator('.sidebar .nav-link').allTextContents();
+    const nav = await page.locator('.app-nav .nav-link').allTextContents();
     for (const x of ['Stock', 'Movimientos', 'Merma', 'Órdenes de compra', 'Proveedores', 'Cuentas por pagar']) assert.ok(nav.includes(x), x);
 
     // ── 1. insumo nuevo desde Stock ──
@@ -120,8 +121,8 @@ let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
 
     // ── 7. rol Florista ──
     await page.click('.user-btn'); await page.click('button:has-text("Cerrar sesión")'); await page.waitForSelector('#login-email');
-    await page.fill('#login-email', 'florista@serafina.test'); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.sidebar');
-    const fNav = await page.locator('.sidebar .nav-link').allTextContents();
+    await page.fill('#login-email', 'florista@serafina.test'); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.app-nav');
+    const fNav = await page.locator('.app-nav .nav-link').allTextContents();
     assert.ok(fNav.includes('Stock') && fNav.includes('Merma') && !fNav.includes('Órdenes de compra') && !fNav.includes('Proveedores') && !fNav.includes('Cuentas por pagar'), fNav.join(','));
     await page.evaluate(() => { location.hash = '#/compras'; }); await page.waitForSelector('text=Sin acceso');
     await go('Stock', 'Stock'); await page.waitForSelector('td:has-text("Rosa roja")');

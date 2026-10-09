@@ -7,6 +7,7 @@ const { chromium } = require('playwright');
 const { makeApp, createUser, login: apiLogin, call, PASSWORD } = require('../test/helpers');
 const { setupFlowers } = require('../test/fixtures');
 
+const { clickNav } = require('./nav');
 const SHOTS = path.join(__dirname, 'screens'); fs.mkdirSync(SHOTS, { recursive: true });
 let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
 
@@ -28,15 +29,15 @@ let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
   page.on('console', (m) => { if (['error', 'warning'].includes(m.type()) && !/fonts\.g|net::|Failed to load resource/.test(m.text())) problems.push(m.text()); });
   page.on('pageerror', (e) => problems.push('pageerror: ' + e.message));
   const shot = (x) => page.screenshot({ path: path.join(SHOTS, `o-${x}.png`) });
-  const login = async (email) => { await page.goto('http://127.0.0.1:4329/admin/'); await page.waitForSelector('#login-email'); await page.fill('#login-email', email); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.sidebar'); };
-  const go = async (label, h1) => { await page.click(`a.nav-link:has-text("${label}")`); await page.waitForSelector(`h1:has-text("${h1}")`); await page.waitForTimeout(250); };
+  const login = async (email) => { await page.goto('http://127.0.0.1:4329/admin/'); await page.waitForSelector('#login-email'); await page.fill('#login-email', email); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.app-nav'); };
+  const go = async (label, h1) => { await clickNav(page, label); await page.waitForSelector(`h1:has-text("${h1}")`); await page.waitForTimeout(250); };
   const toast = (t) => page.waitForSelector(`.toast:has-text("${t}")`);
   const noGarbage = async () => assert.doesNotMatch(await page.textContent('#view'), /\bfalse\b|undefined|\[object|NaN/);
   const future = '2099-06-01';
 
   try {
     await login('admin@serafina.test');
-    const nav = await page.locator('.sidebar .nav-link').allTextContents(); for (const x of ['Pedidos', 'Producción', 'Entregas']) assert.ok(nav.includes(x), x);
+    const nav = await page.locator('.app-nav .nav-link').allTextContents(); for (const x of ['Pedidos', 'Producción', 'Entregas']) assert.ok(nav.includes(x), x);
 
     // 1. zona de delivery
     await go('Entregas', 'Entregas'); await page.click('button:has-text("Zonas y tarifas")');
@@ -80,9 +81,9 @@ let n = 0; const ok = (m) => console.log(`  ✔ ${++n}. ${m}`);
     // 7. repartidor en móvil
     await page.click('.user-btn'); await page.click('button:has-text("Cerrar sesión")'); await page.waitForSelector('#login-email');
     await page.setViewportSize({ width: 390, height: 850 });
-    await page.fill('#login-email', 'repartidor@serafina.test'); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.sidebar, .menu-btn');
+    await page.fill('#login-email', 'repartidor@serafina.test'); await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]'); await page.waitForSelector('.app-nav');
     const rn = await page.evaluate(async () => (await fetch('/api/v1/orders', { credentials: 'same-origin' })).status); assert.equal(rn, 403);
-    await page.click('.menu-btn'); await page.click('a.nav-link:has-text("Entregas")'); await page.waitForSelector('h1:has-text("Mis entregas")');
+    await page.click('.menu-btn'); await clickNav(page, 'Entregas'); await page.waitForSelector('h1:has-text("Mis entregas")');
     assert.match(await page.textContent('#view'), /Cobrar al entregar: 170\.000 Gs\./); assert.ok(await page.locator('a:has-text("Abrir mapa")').count());
     await page.click('button:has-text("Salir a entregar")'); await toast('Salió a entregar'); await shot('3-movil');
     await page.click('button:has-text("Entregado")'); await page.click('.modal-foot button.primary');

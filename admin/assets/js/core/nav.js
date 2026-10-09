@@ -5,10 +5,6 @@
  */
 export const ROUTES = [
   { path: '/', id: 'dashboard', label: 'Dashboard', icon: 'home', group: 'General', anyOf: [], load: () => import('../modules/dashboard/index.js') },
-  { path: '/productos', id: 'products', label: 'Productos', icon: 'box', group: 'Catálogo', anyOf: ['productos.view'], load: () => import('../modules/products/index.js') },
-  { path: '/productos/nuevo', id: 'product-new', navId: 'products', label: 'Nuevo producto', group: null, anyOf: ['productos.create'], load: () => import('../modules/products/editor.js') },
-  { path: '/productos/:id', id: 'product-edit', navId: 'products', label: 'Editar producto', group: null, anyOf: ['productos.view'], load: () => import('../modules/products/editor.js') },
-  { path: '/categorias', id: 'categories', label: 'Categorías', icon: 'list', group: 'Catálogo', anyOf: ['productos.view'], load: () => import('../modules/products/categories.js') },
   { path: '/ventas/nueva', id: 'pos', label: 'Nueva venta', icon: 'plus', group: 'Ventas', anyOf: ['ventas.create'], load: () => import('../modules/sales/pos.js') },
   { path: '/ventas', id: 'sales', label: 'Historial de ventas', icon: 'list', group: 'Ventas', anyOf: ['ventas.view'], load: () => import('../modules/sales/index.js') },
   { path: '/ventas/:id', id: 'sale-detail', navId: 'sales', label: 'Venta', group: null, anyOf: ['ventas.view'], load: () => import('../modules/sales/detail.js') },
@@ -26,9 +22,13 @@ export const ROUTES = [
   { path: '/cotizaciones/nueva', id: 'quote-new', navId: 'events', label: 'Nueva cotización', group: null, anyOf: ['eventos.create'], load: () => import('../modules/events/form.js') },
   { path: '/cotizaciones/:id/editar', id: 'quote-edit', navId: 'events', label: 'Editar cotización', group: null, anyOf: ['eventos.edit'], load: () => import('../modules/events/form.js') },
   { path: '/cotizaciones/:id', id: 'quote-detail', navId: 'events', label: 'Cotización', group: null, anyOf: ['eventos.view'], load: () => import('../modules/events/detail.js') },
-  { path: '/inventario', id: 'stock', label: 'Stock', icon: 'box', group: 'Inventario', anyOf: ['inventario.view'], load: () => import('../modules/inventory/index.js') },
-  { path: '/inventario/movimientos', id: 'movements', label: 'Movimientos', icon: 'list', group: 'Inventario', anyOf: ['inventario.view'], load: () => import('../modules/inventory/movements.js') },
-  { path: '/inventario/merma', id: 'waste', label: 'Merma', icon: 'inbox', group: 'Inventario', anyOf: ['inventario.view', 'inventario.merma'], load: () => import('../modules/inventory/waste.js') },
+  { path: '/productos', id: 'products', label: 'Productos', icon: 'box', group: 'Catálogo y stock', anyOf: ['productos.view'], load: () => import('../modules/products/index.js') },
+  { path: '/productos/nuevo', id: 'product-new', navId: 'products', label: 'Nuevo producto', group: null, anyOf: ['productos.create'], load: () => import('../modules/products/editor.js') },
+  { path: '/productos/:id', id: 'product-edit', navId: 'products', label: 'Editar producto', group: null, anyOf: ['productos.view'], load: () => import('../modules/products/editor.js') },
+  { path: '/categorias', id: 'categories', label: 'Categorías', icon: 'list', group: 'Catálogo y stock', anyOf: ['productos.view'], load: () => import('../modules/products/categories.js') },
+  { path: '/inventario', id: 'stock', label: 'Stock', icon: 'box', group: 'Catálogo y stock', anyOf: ['inventario.view'], load: () => import('../modules/inventory/index.js') },
+  { path: '/inventario/movimientos', id: 'movements', label: 'Movimientos', icon: 'list', group: 'Catálogo y stock', anyOf: ['inventario.view'], load: () => import('../modules/inventory/movements.js') },
+  { path: '/inventario/merma', id: 'waste', label: 'Merma', icon: 'inbox', group: 'Catálogo y stock', anyOf: ['inventario.view', 'inventario.merma'], load: () => import('../modules/inventory/waste.js') },
   { path: '/compras', id: 'purchases', label: 'Órdenes de compra', icon: 'list', group: 'Compras', anyOf: ['compras.view'], load: () => import('../modules/purchasing/index.js') },
   { path: '/compras/nueva', id: 'purchase-new', navId: 'purchases', label: 'Nueva orden', group: null, anyOf: ['compras.create'], load: () => import('../modules/purchasing/order-form.js') },
   { path: '/compras/:id/editar', id: 'purchase-edit', navId: 'purchases', label: 'Editar orden', group: null, anyOf: ['compras.edit'], load: () => import('../modules/purchasing/order-form.js') },
@@ -41,7 +41,7 @@ export const ROUTES = [
   { path: '/usuarios', id: 'users', label: 'Usuarios', icon: 'users', group: 'Administración', anyOf: ['usuarios.view'], load: () => import('../modules/users/index.js') },
   { path: '/roles', id: 'roles', label: 'Roles y permisos', icon: 'shield', group: 'Administración', anyOf: ['roles.view'], load: () => import('../modules/roles/index.js') },
   { path: '/auditoria', id: 'audit', label: 'Auditoría', icon: 'list', group: 'Administración', anyOf: ['auditoria.view'], load: () => import('../modules/audit/index.js') },
-  { path: '/integraciones', id: 'integrations', label: 'Integraciones', icon: 'plug', group: 'Marketing', anyOf: ['marketing.view', 'analytics.view', 'configuracion.view'], load: () => import('../modules/integrations/index.js') },
+  { path: '/integraciones', id: 'integrations', label: 'Integraciones', icon: 'plug', group: 'Administración', anyOf: ['marketing.view', 'analytics.view', 'configuracion.view'], load: () => import('../modules/integrations/index.js') },
   { path: '/cuenta', id: 'account', label: 'Mi cuenta', icon: 'key', group: null, anyOf: [], load: () => import('../modules/account/index.js') },
 ];
 export const visibleRoutes = (session) => ROUTES.filter((r) => r.group && session.canAny(r.anyOf));

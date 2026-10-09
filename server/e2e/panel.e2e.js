@@ -11,6 +11,7 @@ const path = require('node:path');
 const { chromium } = require('playwright');
 const { makeApp, createUser, PASSWORD } = require('../test/helpers');
 
+const { clickNav } = require('./nav');
 const SHOTS = path.join(__dirname, 'screens'); fs.mkdirSync(SHOTS, { recursive: true });
 let step = 0; const ok = (m) => console.log(`  ✔ ${++step}. ${m}`);
 
@@ -42,24 +43,44 @@ let step = 0; const ok = (m) => console.log(`  ✔ ${++step}. ${m}`);
     await page.fill('#login-pass', PASSWORD); await page.click('button[type=submit]');
     await page.waitForSelector('#pw-cur');
     ok('primer ingreso → cambio de contraseña obligatorio (no se ve el panel)');
-    assert.equal(await page.locator('.sidebar').count(), 0);
+    assert.equal(await page.locator('.app-nav').count(), 0);
     await page.fill('#pw-cur', PASSWORD); await page.fill('#pw-new', 'corta'); await page.fill('#pw-rep', 'corta'); await page.click('button[type=submit]');
     await page.waitForSelector('#pw-new-err:not([hidden])');
     ok('contraseña débil rechazada por el servidor, con mensaje en el campo');
     await page.fill('#pw-new', 'Nueva-Clave-Muy-Segura-9'); await page.fill('#pw-rep', 'Nueva-Clave-Muy-Segura-9'); await page.click('button[type=submit]');
-    await page.waitForSelector('.sidebar');
+    await page.waitForSelector('.app-nav');
     ok('cambia la contraseña y entra al panel');
 
-    const navText = await page.locator('.sidebar .nav-link').allTextContents();
-    assert.deepEqual(navText, ['Dashboard', 'Productos', 'Categorías', 'Nueva venta', 'Historial de ventas', 'Cuentas por cobrar', 'Caja', 'Clientes', 'Pedidos', 'Producción', 'Entregas', 'Eventos', 'Stock', 'Movimientos', 'Merma', 'Órdenes de compra', 'Proveedores', 'Cuentas por pagar', 'Finanzas', 'Reportes', 'Usuarios', 'Roles y permisos', 'Auditoría', 'Integraciones']);
+    const navText = await page.locator('.app-nav .nav-link').allTextContents();
+    assert.deepEqual(navText, ['Nueva venta', 'Historial de ventas', 'Cuentas por cobrar', 'Caja', 'Clientes', 'Pedidos', 'Producción', 'Entregas', 'Eventos', 'Productos', 'Categorías', 'Stock', 'Movimientos', 'Merma', 'Órdenes de compra', 'Proveedores', 'Cuentas por pagar', 'Finanzas', 'Reportes', 'Usuarios', 'Roles y permisos', 'Auditoría', 'Integraciones']);
     await page.waitForSelector('.stat');
     assert.doesNotMatch(await page.textContent('#view'), /false|undefined|\[object|NaN/, 'texto basura en el dashboard');
     await shot('02-dashboard');
     ok('administrador ve todos los módulos y el dashboard con datos reales');
     assert.match(await page.textContent('.value >> nth=0'), /^\d+$/);
 
+    // ── Menú superior: desplegables ──
+    const grp = (name) => page.locator('.nav-group', { has: page.locator(`.nav-group-btn:text-is("${name}")`) });
+    assert.equal(await page.locator('.nav-menu:visible').count(), 0, 'cerrados al inicio');
+    await grp('Ventas').locator('.nav-group-btn').click(); await page.waitForSelector('.nav-group.open .nav-menu');
+    assert.equal(await grp('Ventas').locator('.nav-group-btn').getAttribute('aria-expanded'), 'true');
+    await shot('02b-menu-abierto');
+    await grp('Pedidos').locator('.nav-group-btn').hover(); await page.waitForSelector('.nav-group.open:has(.nav-group-btn:text-is("Pedidos"))');
+    assert.equal(await page.locator('.nav-group.open').count(), 1, 'al pasar a otro grupo se cierra el anterior');
+    await page.keyboard.press('Escape'); assert.equal(await page.locator('.nav-group.open').count(), 0, 'Escape cierra');
+    await grp('Finanzas').locator('.nav-group-btn').click(); await page.mouse.click(700, 500); assert.equal(await page.locator('.nav-group.open').count(), 0, 'clic fuera cierra');
+    await grp('Compras').locator('.nav-group-btn').focus(); await page.keyboard.press('ArrowDown');
+    assert.equal(await page.evaluate(() => document.activeElement.textContent.trim()), 'Órdenes de compra', 'flecha abajo enfoca la primera opción');
+    await page.keyboard.press('ArrowRight'); assert.equal(await page.evaluate(() => document.activeElement.textContent.trim()), 'Finanzas', 'flecha derecha pasa al grupo vecino');
+    await page.keyboard.press('Escape');
+    await grp('Administración').locator('.nav-group-btn').click(); await page.click('.nav-group.open a:has-text("Auditoría")'); await page.waitForSelector('h1:has-text("Auditoría")');
+    assert.equal(await page.locator('.nav-group.open').count(), 0, 'elegir una opción cierra el menú');
+    assert.equal(await grp('Administración').locator('.nav-group-btn').getAttribute('data-active'), 'true', 'el grupo de la página actual queda marcado');
+    await page.click('a.nav-top:has-text("Dashboard")'); await page.waitForSelector('.stat');
+    ok('menú superior: abre/cierra (clic, Escape, clic fuera), cambia de grupo con el mouse, teclado y marca el grupo activo');
+
     // ── Usuarios: crear ──
-    await page.click('a.nav-link:has-text("Usuarios")');
+    await clickNav(page, 'Usuarios');
     await page.waitForSelector('h1:has-text("Usuarios")'); await page.waitForSelector('table.table');
     await page.click('button:has-text("Nuevo usuario")');
     await page.fill('#u-name', 'Vera Ventas'); await page.fill('#u-email', 'vera@serafina.test'); await page.selectOption('#u-role', 'ventas');
@@ -93,7 +114,7 @@ let step = 0; const ok = (m) => console.log(`  ✔ ${++step}. ${m}`);
     ok('asigna permiso individual al rol Personalizado');
 
     // ── auditoría ──
-    await page.click('a.nav-link:has-text("Auditoría")');
+    await clickNav(page, 'Auditoría');
     await page.waitForSelector('h1:has-text("Auditoría")'); await page.waitForSelector('th:has-text("Acción")');
     const auditText = await page.locator('table.table').textContent();
     assert.match(auditText, /Creó un usuario/); assert.match(auditText, /Cambió permisos de un usuario/);
@@ -101,7 +122,7 @@ let step = 0; const ok = (m) => console.log(`  ✔ ${++step}. ${m}`);
     ok('la auditoría muestra las acciones realizadas');
 
     // ── roles ──
-    await page.click('a.nav-link:has-text("Roles y permisos")');
+    await clickNav(page, 'Roles y permisos');
     await page.waitForSelector('.perm-module');
     await shot('06-roles');
     ok('pantalla de roles carga la matriz de permisos');
@@ -121,9 +142,9 @@ let step = 0; const ok = (m) => console.log(`  ✔ ${++step}. ${m}`);
     await page.fill('#login-email', 'vera@serafina.test'); await page.fill('#login-pass', 'Inicial-Segura-Rosa-1'); await page.click('button[type=submit]');
     await page.waitForSelector('#pw-cur');
     await page.fill('#pw-cur', 'Inicial-Segura-Rosa-1'); await page.fill('#pw-new', 'Girasol-Seguro-Dorado-22'); await page.fill('#pw-rep', 'Girasol-Seguro-Dorado-22'); await page.click('button[type=submit]');
-    await page.waitForSelector('.sidebar');
-    const vNav = await page.locator('.sidebar .nav-link').allTextContents();
-    assert.deepEqual(vNav, ['Dashboard', 'Productos', 'Categorías', 'Nueva venta', 'Historial de ventas', 'Cuentas por cobrar', 'Caja', 'Clientes', 'Pedidos', 'Eventos', 'Stock', 'Movimientos', 'Merma']);
+    await page.waitForSelector('.app-nav');
+    const vNav = await page.locator('.app-nav .nav-link').allTextContents();
+    assert.deepEqual(vNav, ['Nueva venta', 'Historial de ventas', 'Cuentas por cobrar', 'Caja', 'Clientes', 'Pedidos', 'Eventos', 'Productos', 'Categorías', 'Stock', 'Movimientos', 'Merma']);
     ok('rol Ventas: el menú solo muestra lo permitido');
 
     await page.evaluate(() => { location.hash = '#/usuarios'; });
@@ -145,7 +166,7 @@ let step = 0; const ok = (m) => console.log(`  ✔ ${++step}. ${m}`);
     await real.pool.query(`UPDATE sessions SET revoked_at = now() WHERE revoked_at IS NULL`);
     await page.evaluate(() => { location.hash = '#/cuenta'; });
     await page.click('text=Mi cuenta').catch(() => {});
-    await page.evaluate(() => fetch('/api/v1/auth/me').then(() => document.querySelector('.sidebar a[href="#/"]').click()));
+    await page.evaluate(() => fetch('/api/v1/auth/me').then(() => document.querySelector('.app-nav a[href="#/"]').click()));
     await page.waitForSelector('#login-email', { timeout: 8000 }).catch(async () => { await page.reload(); await page.waitForSelector('#login-email'); });
     ok('sesión revocada en el servidor → vuelve al login');
 
@@ -153,11 +174,11 @@ let step = 0; const ok = (m) => console.log(`  ✔ ${++step}. ${m}`);
     await page.setViewportSize({ width: 390, height: 800 });
     await page.fill('#login-email', 'dueno@serafina.test'); await page.fill('#login-pass', 'Nueva-Clave-Muy-Segura-9'); await page.click('button[type=submit]');
     await page.waitForSelector('.menu-btn');
-    assert.equal(await page.locator('.sidebar').evaluate((e) => getComputedStyle(e).transform !== 'none'), true, 'sidebar fuera de pantalla');
+    assert.equal(await page.locator('.app-nav').evaluate((e) => getComputedStyle(e).transform !== 'none'), true, 'sidebar fuera de pantalla');
     await page.click('.menu-btn');
     await page.waitForFunction(() => document.querySelector('.app').classList.contains('nav-open'));
     await shot('08-movil-menu');
-    await page.click('a.nav-link:has-text("Usuarios")');
+    await clickNav(page, 'Usuarios');
     await page.waitForSelector('table.table');
     const theadHidden = await page.locator('thead').evaluate((e) => getComputedStyle(e).display === 'none');
     assert.ok(theadHidden);
