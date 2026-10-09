@@ -37,6 +37,13 @@ module.exports = async function dashboardRoutes(app) {
            FROM sales WHERE status = 'confirmada'`);
       out.sales = { ...rows[0], averageTicket: rows[0].month_count ? Math.round(rows[0].month_total / rows[0].month_count) : 0 };
     }
+    if (can(req, 'pedidos.view')) {
+      const { rows } = await pool.query(
+        `SELECT count(*) FILTER (WHERE status = 'pendiente')::int AS pending, count(*) FILTER (WHERE status IN ('confirmado','pagado','pendiente_pago','en_preparacion'))::int AS in_progress,
+                count(*) FILTER (WHERE status = 'listo')::int AS ready, count(*) FILTER (WHERE status IN ('confirmado','pagado','pendiente_pago','en_preparacion','listo','en_reparto','reprogramado','no_entregado') AND requested_date = CURRENT_DATE)::int AS due_today
+           FROM orders`);
+      out.orders = rows[0];
+    }
     if (can(req, 'caja.view')) {
       const { rows } = await pool.query(`SELECT s.id, s.opened_at, COALESCE((SELECT sum(amount_pyg) FROM cash_movements m WHERE m.session_id = s.id), 0)::bigint AS expected FROM cash_sessions s WHERE s.closed_at IS NULL`);
       out.cash = rows[0] ? { open: true, openedAt: rows[0].opened_at, expectedCashPyg: rows[0].expected } : { open: false };

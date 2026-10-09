@@ -35,6 +35,11 @@ export default async function mount({ view, session }) {
       cards.push(stat('Ventas del mes', formatGs(d.sales.month_total), `Ticket promedio ${formatGs(d.sales.averageTicket)}`));
       cards.push(stat('Por cobrar a clientes', formatGs(d.sales.receivable), d.sales.receivable_overdue > 0 ? `${formatGs(d.sales.receivable_overdue)} vencido` : 'Sin deuda vencida'));
     }
+    if (d.orders) {
+      cards.push(stat('Pedidos pendientes', d.orders.pending, 'Por confirmar'));
+      cards.push(stat('Pedidos en curso', d.orders.in_progress, `${d.orders.ready} listo(s) para entregar`));
+      cards.push(stat('Para entregar hoy', d.orders.due_today, 'Pedidos con fecha de hoy'));
+    }
     if (d.cash) cards.push(stat('Caja', d.cash.open ? formatGs(d.cash.expectedCashPyg) : 'Cerrada', d.cash.open ? 'Efectivo esperado en caja' : 'Abrila para cobrar en efectivo'));
     if (d.inventory) {
       cards.push(stat('Stock agotado', d.inventory.out, d.inventory.out ? 'Revisá reposición' : 'Nada agotado'));

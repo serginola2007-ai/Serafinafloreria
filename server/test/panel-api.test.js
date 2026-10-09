@@ -33,7 +33,7 @@ describe('API de soporte del panel', () => {
 
   test('dashboard: solo muestra secciones permitidas y datos reales', async () => {
     const a = (await call(app, admin, 'GET', '/api/v1/dashboard/summary')).json();
-    assert.deepEqual(Object.keys(a).sort(), ['cash', 'catalog', 'integrations', 'inventory', 'purchasing', 'recentActivity', 'sales', 'users']);
+    assert.deepEqual(Object.keys(a).sort(), ['cash', 'catalog', 'integrations', 'inventory', 'orders', 'purchasing', 'recentActivity', 'sales', 'users']);
     assert.equal(a.users.active, 3); assert.equal(a.users.inactive, 1);
     assert.equal(a.integrations.withCredentials, 0);
     const rep = await userWithRole(app, 'repartidor', 'r@test.local');

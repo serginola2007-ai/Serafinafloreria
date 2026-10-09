@@ -50,6 +50,13 @@ module.exports = async function deliveryRoutes(app) {
   act('fail', (tx, req) => S.fail(tx, req, req.params.id, req.body.reason.trim()), operate, { type: 'object', required: ['reason'], additionalProperties: false, properties: { reason: { type: 'string', minLength: 3, maxLength: 300 } } });
   act('reschedule', (tx, req) => S.reschedule(tx, req, req.params.id, req.body), operate, { type: 'object', required: ['date', 'reason'], additionalProperties: false, properties: { date: { type: 'string', format: 'date' }, timeSlot: { type: ['string', 'null'], maxLength: 60 }, reason: { type: 'string', minLength: 3, maxLength: 300 } } });
 
+  // Repartidores disponibles (usuarios activos con permiso de entregas propias) para el selector de asignación.
+  app.get('/api/v1/delivery-couriers', { config: access.perm('delivery.edit') }, async () => {
+    const { rows } = await pool.query(`SELECT DISTINCT u.id, u.full_name FROM users u JOIN roles r ON r.id = u.role_id
+      WHERE u.active AND (r.is_superuser = false) AND EXISTS (SELECT 1 FROM role_permissions rp JOIN permissions p ON p.id = rp.permission_id WHERE rp.role_id = r.id AND p.code = 'delivery.own') ORDER BY u.full_name`);
+    return { data: rows.map((u) => ({ id: u.id, name: u.full_name })) };
+  });
+
   /* ───────── Rutas ───────── */
   app.get('/api/v1/delivery-routes', { config: view, schema: { querystring: { type: 'object', properties: { date: { type: 'string', format: 'date' } } } } }, async (req) => {
     const args = []; const conds = [];

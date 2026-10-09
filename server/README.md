@@ -62,3 +62,14 @@ npm run e2e     # 3 recorridos en Chromium real (panel, sitio público ↔ API, 
 - **Costos y márgenes**: solo se muestran con `finanzas.view`/`reportes.view`. Una línea sin receta ni stock propio se marca `cost_known = false` y NO se inventa margen.
 - **Comprobante interno**: imprimible, rotulado "No es un documento fiscal". No hay IVA calculado ni facturación: la configuración fiscal sigue pendiente de confirmación con el contador (ver `tax_categories`).
 - Nota de costeo: el *costo promedio* (referencia para recetas y márgenes proyectados) cambia solo con ingresos; el costo *real* de cada venta sale de los lotes que efectivamente se consumieron.
+
+## Pedidos, producción y delivery (Fase 3f)
+
+- **Pedidos** (`/api/v1/orders`): estados consulta → cotización → pendiente → confirmado/pagado → en preparación → listo → en reparto → entregado (o cancelado/reprogramado/no entregado). Los precios los calcula siempre el servidor.
+- **Stock**: confirmar un pedido **reserva** insumos (`inventory_levels.reserved`, tabla `stock_reservations`); el stock físico no cambia hasta producir. La reserva impide vender ese stock en el mostrador. `GET /orders/demand` avisa cuando los pedidos pendientes piden más de lo disponible.
+- **Producción** (`/api/v1/production`): iniciar consume la reserva (FEFO, costo real congelado); checklist → control de calidad → aprobación. Rechazar devuelve el trabajo a preparación.
+- **Delivery** (`/api/v1/deliveries`, `/delivery-routes`, `/delivery-zones`): asignar repartidor, salir, entregar, fallar, reprogramar. Un usuario con solo `delivery.own` ve y opera únicamente sus entregas (403 en el resto).
+- **Cierre**: al entregar (o retirar) se genera la **venta** con el costo congelado de producción; los cobros anticipados pasan a esa venta. Con saldo pendiente se exige cliente y vencimiento (cuentas por cobrar).
+- **Cancelación**: reembolsa lo cobrado (efectivo requiere caja abierta); si ya se produjo, hay que indicar si los materiales vuelven al stock o van a merma.
+- **Pedido web** `POST /api/v1/public/orders`: sin sesión, con límite por IP y campo trampa; devuelve solo número y total. Aún no está conectado al formulario del sitio público.
+- Pendiente: foto de comprobante subida por el repartidor (hoy se acepta un `proofMediaId` ya subido), geocodificación/mapas reales, eventos y cotizaciones.

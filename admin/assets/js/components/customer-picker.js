@@ -28,6 +28,7 @@ export function customerPicker({ onChange } = {}) {
   }
   search.addEventListener('input', () => { clearTimeout(timer); const q = search.value.trim(); if (q.length < 2) { results.style.display = 'none'; return; } timer = setTimeout(() => find(q), 250); });
   root.getValue = () => current;
+  root.setValue = (c) => set(c);
   root.clear = () => set(null);
   root.set = set;
   return root;

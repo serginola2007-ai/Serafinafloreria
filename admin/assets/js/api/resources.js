@@ -74,3 +74,20 @@ export const salesApi = {
   catalog: (q) => get('/pos/catalog', q), create: (b) => post('/sales', b), list: (q) => get('/sales', q), get: (id) => get(`/sales/${id}`),
   void: (id, reason) => post(`/sales/${id}/void`, { reason }), pay: (id, b) => post(`/sales/${id}/payments`, b), receivables: (q) => get('/receivables', q),
 };
+
+export const ordersApi = {
+  list: (q) => get('/orders', q), get: (id) => get(`/orders/${id}`), create: (b) => post('/orders', b), update: (id, b) => put(`/orders/${id}`, b),
+  confirm: (id) => post(`/orders/${id}/confirm`), transition: (id, to, note) => post(`/orders/${id}/transition`, { to, note }), pay: (id, b) => post(`/orders/${id}/payments`, b),
+  cancel: (id, b) => post(`/orders/${id}/cancel`, b), complete: (id, b) => post(`/orders/${id}/complete`, b ?? {}), demand: () => get('/orders/demand'),
+  zones: () => get('/delivery-zones'), createZone: (b) => post('/delivery-zones', b), updateZone: (id, b) => patch(`/delivery-zones/${id}`, b),
+};
+export const productionApi = {
+  list: (q) => get('/production', q), get: (id) => get(`/production/${id}`), start: (id) => post(`/production/${id}/start`), quality: (id) => post(`/production/${id}/quality`),
+  approve: (id) => post(`/production/${id}/approve`), reject: (id, note) => post(`/production/${id}/reject`, { note }), checklist: (id, code, done) => put(`/production/${id}/checklist/${code}`, { done }),
+  assign: (id, userId) => put(`/production/${id}/assignee`, { userId }),
+};
+export const deliveryApi = {
+  list: (q) => get('/deliveries', q), get: (id) => get(`/deliveries/${id}`), assign: (id, courierId) => post(`/deliveries/${id}/assign`, { courierId }), start: (id) => post(`/deliveries/${id}/start`),
+  deliver: (id, b) => post(`/deliveries/${id}/deliver`, b ?? {}), fail: (id, reason) => post(`/deliveries/${id}/fail`, { reason }), reschedule: (id, b) => post(`/deliveries/${id}/reschedule`, b),
+  couriers: () => get('/delivery-couriers'), routes: (q) => get('/delivery-routes', q), createRoute: (b) => post('/delivery-routes', b),
+};
