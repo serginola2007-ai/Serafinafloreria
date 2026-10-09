@@ -13,7 +13,7 @@
     "import-legacy-catalog": "node scripts/import-legacy-catalog.js",
     "test": "NODE_ENV=test node --test --test-concurrency=1 --test-reporter=spec test/*.test.js",
     "check": "node scripts/check-syntax.js",
-    "e2e": "NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/panel.e2e.js && NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/site.e2e.js && NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/catalog.e2e.js && NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/inventory.e2e.js && NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/sales.e2e.js && NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/orders.e2e.js && NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/finance.e2e.js"
+    "e2e": "NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/panel.e2e.js && NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/site.e2e.js && NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/catalog.e2e.js && NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/inventory.e2e.js && NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/sales.e2e.js && NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/orders.e2e.js && NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/finance.e2e.js && NODE_PATH=${PLAYWRIGHT_NODE_PATH:-/opt/node22/lib/node_modules} node e2e/events.e2e.js"
   },
   "keywords": [],
   "author": "",

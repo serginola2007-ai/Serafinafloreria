@@ -51,7 +51,7 @@ let step = 0; const ok = (m) => console.log(`  ✔ ${++step}. ${m}`);
     ok('cambia la contraseña y entra al panel');
 
     const navText = await page.locator('.sidebar .nav-link').allTextContents();
-    assert.deepEqual(navText, ['Dashboard', 'Productos', 'Categorías', 'Nueva venta', 'Historial de ventas', 'Cuentas por cobrar', 'Caja', 'Clientes', 'Pedidos', 'Producción', 'Entregas', 'Stock', 'Movimientos', 'Merma', 'Órdenes de compra', 'Proveedores', 'Cuentas por pagar', 'Finanzas', 'Usuarios', 'Roles y permisos', 'Auditoría', 'Integraciones']);
+    assert.deepEqual(navText, ['Dashboard', 'Productos', 'Categorías', 'Nueva venta', 'Historial de ventas', 'Cuentas por cobrar', 'Caja', 'Clientes', 'Pedidos', 'Producción', 'Entregas', 'Eventos', 'Stock', 'Movimientos', 'Merma', 'Órdenes de compra', 'Proveedores', 'Cuentas por pagar', 'Finanzas', 'Usuarios', 'Roles y permisos', 'Auditoría', 'Integraciones']);
     await page.waitForSelector('.stat');
     assert.doesNotMatch(await page.textContent('#view'), /false|undefined|\[object|NaN/, 'texto basura en el dashboard');
     await shot('02-dashboard');
@@ -123,7 +123,7 @@ let step = 0; const ok = (m) => console.log(`  ✔ ${++step}. ${m}`);
     await page.fill('#pw-cur', 'Inicial-Segura-Rosa-1'); await page.fill('#pw-new', 'Girasol-Seguro-Dorado-22'); await page.fill('#pw-rep', 'Girasol-Seguro-Dorado-22'); await page.click('button[type=submit]');
     await page.waitForSelector('.sidebar');
     const vNav = await page.locator('.sidebar .nav-link').allTextContents();
-    assert.deepEqual(vNav, ['Dashboard', 'Productos', 'Categorías', 'Nueva venta', 'Historial de ventas', 'Cuentas por cobrar', 'Caja', 'Clientes', 'Pedidos', 'Stock', 'Movimientos', 'Merma']);
+    assert.deepEqual(vNav, ['Dashboard', 'Productos', 'Categorías', 'Nueva venta', 'Historial de ventas', 'Cuentas por cobrar', 'Caja', 'Clientes', 'Pedidos', 'Eventos', 'Stock', 'Movimientos', 'Merma']);
     ok('rol Ventas: el menú solo muestra lo permitido');
 
     await page.evaluate(() => { location.hash = '#/usuarios'; });

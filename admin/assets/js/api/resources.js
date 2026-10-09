@@ -96,3 +96,9 @@ export const financeApi = {
   summary: (q) => get('/finance/summary', q), expenses: (q) => get('/expenses', q), createExpense: (b) => post('/expenses', b), voidExpense: (id, reason) => post(`/expenses/${id}/void`, { reason }),
   categories: () => get('/expense-categories'), createCategory: (name) => post('/expense-categories', { name }), updateCategory: (id, b) => patch(`/expense-categories/${id}`, b),
 };
+
+export const eventsApi = {
+  events: (q) => get('/events', q), event: (id) => get(`/events/${id}`), createEvent: (b) => post('/events', b), updateEvent: (id, b) => patch(`/events/${id}`, b),
+  quotations: (q) => get('/quotations', q), quotation: (id) => get(`/quotations/${id}`), createQuotation: (b) => post('/quotations', b), updateQuotation: (id, b) => put(`/quotations/${id}`, b),
+  send: (id) => post(`/quotations/${id}/send`), accept: (id) => post(`/quotations/${id}/accept`), reject: (id, reason) => post(`/quotations/${id}/reject`, { reason }), convert: (id, b) => post(`/quotations/${id}/convert`, b),
+};

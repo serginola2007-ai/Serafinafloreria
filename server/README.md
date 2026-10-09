@@ -80,3 +80,9 @@ npm run e2e     # 3 recorridos en Chromium real (panel, sitio público ↔ API, 
 - **Gastos** (`/api/v1/expenses`, `/expense-categories`): categorías definidas por el negocio (no se siembran datos de ejemplo). Un gasto en efectivo sale de la caja abierta (movimiento `gasto`); se anula con motivo y el efectivo vuelve. Nunca se borran.
 - **Resumen** (`GET /api/v1/finance/summary?from&to`): ventas − costo de lo vendido (congelado al vender) − gastos. Si hay líneas sin costo conocido, margen y resultado son `null`: no se inventan.
 - Las compras de mercadería no son gasto (entran al inventario y llegan como costo vendido). Es un resumen de gestión, **no un balance ni un cálculo de impuestos**: IVA y régimen fiscal siguen pendientes del contador.
+
+## Eventos y cotizaciones (Fase 3h)
+
+- **Eventos** (`/api/v1/events`): casamiento, corporativo, etc., ligados a un cliente, con fecha, lugar y estado.
+- **Cotizaciones** (`/api/v1/quotations`): borrador → enviada → aceptada/rechazada → convertida. Los productos del catálogo toman SIEMPRE el precio del servidor; los ítems libres (montaje, decoración) llevan precio manual. Cualquier descuento exige `ventas.discount`. Una cotización enviada vence en `valid_until` y ya no puede aceptarse.
+- **Conversión a pedido**: solo si está aceptada y **todos** sus ítems son del catálogo (los libres no tienen stock ni receta); crea un pedido `pendiente` canal `evento` con el descuento acordado. Las cotizaciones con ítems libres quedan como documento comercial (no es un comprobante fiscal).
