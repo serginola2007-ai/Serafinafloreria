@@ -6,7 +6,8 @@ import { openModal } from '../../components/modal.js';
 import { openMediaPicker } from '../../components/media-picker.js';
 import { confirmDialog } from '../../components/confirm.js';
 import { toast } from '../../components/toast.js';
-import { productsApi, categoriesApi } from '../../api/resources.js';
+import { productsApi, categoriesApi, recipesApi } from '../../api/resources.js';
+import { openRecipe } from './recipe.js';
 import { formatGs, formatDateTime, parseGs } from '../../utils/format.js';
 import { statusBadge } from './index.js';
 
@@ -18,16 +19,16 @@ export default async function mount({ view, session, params, navigate }) {
   const isNew = !params.id;
   const can = (c) => session.can(c);
   const root = h('div', {}, skeletonRows(8)); view.append(root);
-  let product = null; let categories = [];
+  let product = null; let categories = []; let costing = [];
   const draft = { variants: [{ label: 'Único', price: '' }], mediaIds: [], urls: new Map(), data: { name: '', categoryId: '', kind: 'finished', sku: '', description: '' } }; // solo para "nuevo": sobrevive a los re-dibujados
 
   try {
     categories = (await categoriesApi.list()).data.filter((c) => !c.archived);
-    if (!isNew) product = await productsApi.get(params.id);
+    if (!isNew) { product = await productsApi.get(params.id); costing = (await recipesApi.costing(params.id).catch(() => ({ data: [] }))).data; }
   } catch (e) { setChildren(root, errorState(e.message, () => location.reload())); return; }
 
   const failMsg = (e) => (e.code === 'PRODUCT_INCOMPLETE' && e.details?.missing ? `No se puede publicar. Falta: ${e.details.missing.join(', ')}` : e.message);
-  async function refresh(p) { product = p ?? await productsApi.get(product.id); render(); }
+  async function refresh(p) { product = p ?? await productsApi.get(product.id); costing = (await recipesApi.costing(product.id).catch(() => ({ data: [] }))).data; render(); }
 
   function render() {
     const editable = isNew ? can('productos.create') : can('productos.edit') && product.status !== 'archived';
@@ -87,6 +88,7 @@ export default async function mount({ view, session, params, navigate }) {
           extra: [
             editable && save,
             h('button', { class: 'btn sm', type: 'button', onclick: () => priceHistory(v) }, 'Historial'),
+            product.kind === 'finished' && h('button', { class: 'btn sm', type: 'button', onclick: () => openRecipe({ variant: v, product, canEdit: can('productos.edit'), onChanged: () => refresh() }) }, (() => { const c = costing.find((x) => x.variantId === v.id); return c?.hasRecipe ? `Receta · margen ${c.marginPct ?? '—'}%` : 'Receta'; })()),
             editable && h('button', { class: 'btn sm', type: 'button', onclick: () => toggleVariant(v) }, v.active ? 'Desactivar' : 'Activar'),
           ].filter(Boolean) });
         r.row.classList.toggle('inactive', !v.active); if (!v.active) r.l.after(h('span', { class: 'sr-only' }, ' (inactiva)'));

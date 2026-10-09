@@ -52,3 +52,13 @@ npm run e2e     # 3 recorridos en Chromium real (panel, sitio público ↔ API, 
 - **Recepción de compra** (una sola transacción): recibo + lotes + movimientos + costo promedio + último precio/historial del proveedor + cuenta por pagar. Si algo falla, no se guarda nada.
 - **Integridad**: `verifyIntegrity()` comprueba `stock físico = Σ lotes = Σ movimientos` (corre en las pruebas).
 - Pendiente de otros módulos: reservas por pedidos, producción/recetas (consumen con `consumeStock`), devoluciones a proveedor, vínculo de pagos en efectivo con la caja.
+
+## Clientes, recetas, caja y ventas (Fase 3e)
+- **Clientes y destinatarios** son entidades distintas (el destinatario puede o no estar ligado a un cliente). Direcciones, fechas importantes (con próximas fechas), estadísticas reales (total comprado, ticket promedio, saldo) y exportación CSV protegida contra inyección de fórmulas.
+- **Recetas** (`recipe_components` + costos extra por variante): costo = componentes al costo promedio + extras; margen y % calculados; "cuántos se pueden armar" con el stock disponible; copiar con factor; activar/desactivar.
+- **Venta** (`POST /sales`, una transacción): precios siempre desde la base; valida TODO el stock antes de tocar nada (informa cada faltante); descuenta componentes FEFO; **congela el costo real** (lotes consumidos + extras) línea por línea; registra pagos; el efectivo mueve la caja; el saldo queda como cuenta por cobrar (exige cliente y vencimiento). Descuentos solo con `ventas.discount`.
+- **Anulación**: repone el stock al costo original, devuelve el dinero con contra-asientos (`sale_refunds`) y el efectivo sale de la caja abierta. Nada se borra.
+- **Caja**: una sola abierta a la vez (índice único); movimientos append-only; arqueo (esperado vs contado) al cerrar; nunca queda en negativo. Los pagos a proveedores en efectivo también salen de la caja.
+- **Costos y márgenes**: solo se muestran con `finanzas.view`/`reportes.view`. Una línea sin receta ni stock propio se marca `cost_known = false` y NO se inventa margen.
+- **Comprobante interno**: imprimible, rotulado "No es un documento fiscal". No hay IVA calculado ni facturación: la configuración fiscal sigue pendiente de confirmación con el contador (ver `tax_categories`).
+- Nota de costeo: el *costo promedio* (referencia para recetas y márgenes proyectados) cambia solo con ingresos; el costo *real* de cada venta sale de los lotes que efectivamente se consumieron.

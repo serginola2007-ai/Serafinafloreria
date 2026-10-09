@@ -11,7 +11,9 @@ const ACTIONS = { 'auth.login': 'Inició sesión', 'auth.logout': 'Cerró sesió
   'inventory.adjust_in': 'Ajustó stock (+)', 'inventory.adjust_out': 'Ajustó stock (−)', 'inventory.waste': 'Registró merma', 'inventory.item_enrolled': 'Incorporó un producto al inventario', 'inventory.settings_changed': 'Cambió límites de stock',
   'purchase_order.created': 'Creó una orden de compra', 'purchase_order.updated': 'Editó una orden de compra', 'purchase_order.sent': 'Envió una orden de compra', 'purchase_order.cancelled': 'Canceló una orden de compra', 'purchase_order.closed': 'Cerró una orden de compra',
   'purchase.received': 'Recibió mercadería', 'payable.payment': 'Registró un pago a proveedor', 'supplier.created': 'Creó un proveedor', 'supplier.updated': 'Modificó un proveedor', 'supplier.archived': 'Archivó un proveedor',
-  'product.created': 'Creó un producto', 'product.updated': 'Modificó un producto', 'product.published': 'Publicó un producto', 'product.unpublished': 'Despublicó un producto', 'product.archived': 'Archivó un producto', 'variant.price_changed': 'Cambió un precio', 'category.created': 'Creó una categoría' };
+  'product.created': 'Creó un producto', 'product.updated': 'Modificó un producto', 'product.published': 'Publicó un producto', 'product.unpublished': 'Despublicó un producto', 'product.archived': 'Archivó un producto', 'variant.price_changed': 'Cambió un precio', 'category.created': 'Creó una categoría',
+  'sale.confirmed': 'Confirmó una venta', 'sale.voided': 'Anuló una venta', 'sale.payment_added': 'Registró un cobro', 'cash.opened': 'Abrió la caja', 'cash.closed': 'Cerró la caja', 'cash.ingreso': 'Registró un ingreso de caja', 'cash.egreso': 'Registró un egreso de caja', 'cash.retiro': 'Registró un retiro de caja',
+  'customer.created': 'Creó un cliente', 'customer.updated': 'Modificó un cliente', 'customer.archived': 'Archivó un cliente', 'recipe.updated': 'Modificó una receta', 'recipe.copied': 'Copió una receta' };
 export const actionLabel = (a) => ACTIONS[a] || a;
 
 export default async function mount({ view, session }) {
@@ -28,6 +30,12 @@ export default async function mount({ view, session }) {
       cards.push(stat('Productos publicados', d.catalog.published, `${d.catalog.categories} categorías`));
       cards.push(stat('Productos a revisar', d.catalog.needs_review, d.catalog.needs_review ? 'Requieren revisión manual' : 'Nada pendiente'));
     }
+    if (d.sales) {
+      cards.push(stat('Ventas de hoy', formatGs(d.sales.today_total), `${d.sales.today_count} venta(s)`));
+      cards.push(stat('Ventas del mes', formatGs(d.sales.month_total), `Ticket promedio ${formatGs(d.sales.averageTicket)}`));
+      cards.push(stat('Por cobrar a clientes', formatGs(d.sales.receivable), d.sales.receivable_overdue > 0 ? `${formatGs(d.sales.receivable_overdue)} vencido` : 'Sin deuda vencida'));
+    }
+    if (d.cash) cards.push(stat('Caja', d.cash.open ? formatGs(d.cash.expectedCashPyg) : 'Cerrada', d.cash.open ? 'Efectivo esperado en caja' : 'Abrila para cobrar en efectivo'));
     if (d.inventory) {
       cards.push(stat('Stock agotado', d.inventory.out, d.inventory.out ? 'Revisá reposición' : 'Nada agotado'));
       cards.push(stat('Stock bajo mínimo', d.inventory.low, `Valor del inventario ${formatGs(d.inventory.value)}`));

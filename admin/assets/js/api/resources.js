@@ -55,3 +55,22 @@ export const purchasingApi = {
   receive: (id, b) => post(`/purchase-orders/${id}/receive`, b),
   payables: (q) => get('/payables', q), payable: (id) => get(`/payables/${id}`), pay: (id, b) => post(`/payables/${id}/payments`, b), methods: () => get('/payment-methods'),
 };
+
+export const customersApi = {
+  list: (q) => get('/customers', q), get: (id) => get(`/customers/${id}`), create: (b) => post('/customers', b), update: (id, b) => patch(`/customers/${id}`, b), archive: (id) => del(`/customers/${id}`),
+  addAddress: (id, b) => post(`/customers/${id}/addresses`, b), updateAddress: (aid, b) => patch(`/customer-addresses/${aid}`, b), removeAddress: (aid) => del(`/customer-addresses/${aid}`),
+  addDate: (id, b) => post(`/customers/${id}/dates`, b), removeDate: (did) => del(`/customer-dates/${did}`), upcoming: (days = 30) => get('/customers/upcoming-dates', { days }),
+};
+export const recipientsApi = { list: (q) => get('/recipients', q), create: (b) => post('/recipients', b), update: (id, b) => patch(`/recipients/${id}`, b), archive: (id) => del(`/recipients/${id}`) };
+export const recipesApi = {
+  get: (variantId) => get(`/variants/${variantId}/recipe`), save: (variantId, b) => put(`/variants/${variantId}/recipe`, b),
+  copyFrom: (variantId, sourceVariantId, factor = 1) => post(`/variants/${variantId}/recipe/copy-from`, { sourceVariantId, factor }), costing: (productId) => get(`/products/${productId}/costing`),
+};
+export const cashApi = {
+  current: () => get('/cash/current'), open: (openingAmountPyg) => post('/cash/open', { openingAmountPyg }), close: (b) => post('/cash/close', b),
+  move: (b) => post('/cash/movements', b), sessions: (q) => get('/cash/sessions', q), session: (id) => get(`/cash/sessions/${id}`),
+};
+export const salesApi = {
+  catalog: (q) => get('/pos/catalog', q), create: (b) => post('/sales', b), list: (q) => get('/sales', q), get: (id) => get(`/sales/${id}`),
+  void: (id, reason) => post(`/sales/${id}/void`, { reason }), pay: (id, b) => post(`/sales/${id}/payments`, b), receivables: (q) => get('/receivables', q),
+};
