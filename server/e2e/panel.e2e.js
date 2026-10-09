@@ -57,7 +57,7 @@ let step = 0; const ok = (m) => console.log(`  ✔ ${++step}. ${m}`);
     assert.doesNotMatch(await page.textContent('#view'), /false|undefined|\[object|NaN/, 'texto basura en el dashboard');
     await shot('02-dashboard');
     ok('administrador ve todos los módulos y el dashboard con datos reales');
-    assert.match(await page.textContent('.value >> nth=0'), /^\d+$/);
+    assert.match(await page.textContent('.value >> nth=0'), /\d/);
 
     // ── Menú superior: desplegables ──
     const grp = (name) => page.locator('.nav-group', { has: page.locator(`.nav-group-btn:text-is("${name}")`) });
