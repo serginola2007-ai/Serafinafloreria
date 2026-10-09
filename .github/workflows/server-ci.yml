@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16
+        image: public.ecr.aws/docker/library/postgres:16   # espejo oficial en AWS: evita el límite de descargas anónimas de Docker Hub
         env: { POSTGRES_USER: serafina, POSTGRES_PASSWORD: serafina_dev, POSTGRES_DB: serafina_test }
         ports: ['5432:5432']
         options: >-
